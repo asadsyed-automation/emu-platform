@@ -1,11 +1,14 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import dns from 'dns';
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import { Enrollment } from '../models/Enrollment.js';
 import { TimetableSlot } from '../models/TimetableSlot.js';
 import { Lecture } from '../models/Lecture.js';
 
+// Set public DNS servers for MongoDB Atlas SRV resolution
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 dotenv.config();
 
 const realStudentsData = [
@@ -82,7 +85,7 @@ const seedData = async () => {
     }
 
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ Connected to MongoDB for Seeding Real Section Data...');
+    console.log('✅ Connected to MongoDB Atlas for Seeding Real Section Data...');
 
     // Clear existing collections
     await User.deleteMany({});
@@ -143,13 +146,11 @@ const seedData = async () => {
     // 4. Create Students and Enroll in All Courses
     let studentCount = 0;
     for (const s of realStudentsData) {
-      // Use rollNumber as initial password, or fallback Password123!
-      const userPassHash = await User.hashPassword(s.rollNumber);
       const student = await User.create({
         rollNumber: s.rollNumber,
         name: s.name,
         email: s.email,
-        passwordHash: userPassHash,
+        passwordHash: defaultPasswordHash,
         role: 'student',
         otpVerified: s.rollNumber === 'COSC231122114', // Pre-verify Shah G's student account for quick testing
       });
@@ -229,8 +230,8 @@ const seedData = async () => {
     console.log('\n✨ Database Seeding Complete!');
     console.log('------------------------------------------------------------------------');
     console.log(`Owner Account:   OWNER-01 / Password123!`);
-    console.log(`Shah G Student:  COSC231122114 / COSC231122114 (Pre-verified)`);
-    console.log(`Other Students:  COSC231122102 ... COSC231122161 / <RollNumber> (OTP on 1st login)`);
+    console.log(`Shah G Student:  COSC231122114 / Password123! (Pre-verified)`);
+    console.log(`Other Students:  COSC231122102 ... COSC231122161 / Password123! (OTP on 1st login)`);
     console.log(`Teacher Login:   TCH-CC01 / Password123! (Dr. Wasif Akbar)`);
     console.log('------------------------------------------------------------------------');
 
