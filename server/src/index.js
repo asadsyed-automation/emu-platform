@@ -8,6 +8,7 @@ import courseRoutes from './routes/courseRoutes.js';
 import timetableRoutes from './routes/timetableRoutes.js';
 import lectureRoutes from './routes/lectureRoutes.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
+import disputeRoutes from './routes/disputeRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/timetable', timetableRoutes);
 app.use('/api/v1/lectures', lectureRoutes);
 app.use('/api/v1/attendance', attendanceRoutes);
+app.use('/api/v1/disputes', disputeRoutes);
 
 // Global 404 Handler
 app.use((req, res) => {

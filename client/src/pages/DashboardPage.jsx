@@ -7,6 +7,8 @@ import { LectureCalendar } from '../components/LectureCalendar';
 import { FastAttendanceSheet } from '../components/FastAttendanceSheet';
 import { StudentAttendanceSummary } from '../components/StudentAttendanceSummary';
 import { CourseAttendanceReport } from '../components/CourseAttendanceReport';
+import { PeerVotingWidget } from '../components/PeerVotingWidget';
+import { TeacherDisputeQueue } from '../components/TeacherDisputeQueue';
 import { Shield, User, GraduationCap, UserPlus, CheckCircle2, RefreshCw, CheckSquare, Sparkles } from 'lucide-react';
 
 export const DashboardPage = () => {
@@ -126,6 +128,9 @@ export const DashboardPage = () => {
         </div>
       )}
 
+      {/* Peer Validation Widget (For Students who are peer voters) */}
+      {user?.role === 'student' && <PeerVotingWidget />}
+
       {/* Teacher / Owner Fast Attendance Trigger Banner */}
       {(user?.role === 'teacher' || user?.role === 'owner') && !activeFastMarkLecture && (
         <div style={{
@@ -184,6 +189,9 @@ export const DashboardPage = () => {
         <>
           {/* Student Dedicated View */}
           {user?.role === 'student' && <StudentAttendanceSummary />}
+
+          {/* Teacher / Owner Escalated Dispute Queue */}
+          {(user?.role === 'teacher' || user?.role === 'owner') && <TeacherDisputeQueue />}
 
           {/* Teacher / Owner Class-Wide Attendance Matrix */}
           {(user?.role === 'teacher' || user?.role === 'owner') && <CourseAttendanceReport />}
