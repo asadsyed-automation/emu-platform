@@ -4,7 +4,10 @@ import API from '../services/api';
 import { OwnerBulkImportModal } from '../components/OwnerBulkImportModal';
 import { TimetableGrid } from '../components/TimetableGrid';
 import { LectureCalendar } from '../components/LectureCalendar';
-import { Shield, User, GraduationCap, UserPlus, CheckCircle2, BookOpen, Clock, Calendar, RefreshCw } from 'lucide-react';
+import { FastAttendanceSheet } from '../components/FastAttendanceSheet';
+import { StudentAttendanceSummary } from '../components/StudentAttendanceSummary';
+import { CourseAttendanceReport } from '../components/CourseAttendanceReport';
+import { Shield, User, GraduationCap, UserPlus, CheckCircle2, RefreshCw, CheckSquare, Sparkles } from 'lucide-react';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
@@ -13,6 +16,8 @@ export const DashboardPage = () => {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [generatingLectures, setGeneratingLectures] = useState(false);
   const [actionMessage, setActionMessage] = useState('');
+  const [activeFastMarkLecture, setActiveFastMarkLecture] = useState(null);
+  const [todaysLectures, setTodaysLectures] = useState([]);
 
   const fetchUsers = async () => {
     if (user?.role !== 'owner') return;
@@ -27,12 +32,22 @@ export const DashboardPage = () => {
     }
   };
 
+  const fetchLecturesForMarking = async () => {
+    try {
+      const res = await API.get('/lectures');
+      setTodaysLectures(res.data.lectures || []);
+    } catch (err) {
+      console.error('Error loading lectures:', err);
+    }
+  };
+
   const handleGenerateLectures = async () => {
     setGeneratingLectures(true);
     setActionMessage('');
     try {
       const res = await API.post('/lectures/generate-semester');
       setActionMessage(res.data.message || 'Semester lectures generated successfully!');
+      fetchLecturesForMarking();
     } catch (err) {
       setActionMessage(err.response?.data?.message || 'Error generating semester lectures.');
     } finally {
@@ -42,6 +57,7 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     fetchUsers();
+    fetchLecturesForMarking();
   }, [user]);
 
   return (
@@ -110,14 +126,76 @@ export const DashboardPage = () => {
         </div>
       )}
 
-      {/* Main Timetable Grid (Visible to All Roles) */}
-      <TimetableGrid />
+      {/* Teacher / Owner Fast Attendance Trigger Banner */}
+      {(user?.role === 'teacher' || user?.role === 'owner') && !activeFastMarkLecture && (
+        <div style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: 'var(--radius-lg)',
+          padding: '20px 24px',
+          boxShadow: 'var(--shadow-sm)',
+          border: '1px solid var(--border-color)',
+          borderLeft: '5px solid var(--eum-maroon)',
+          marginBottom: '24px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <CheckSquare size={24} style={{ color: 'var(--eum-maroon)' }} />
+              <div>
+                <h3 style={{ fontSize: '1.15rem', color: 'var(--eum-maroon)' }}>Fast 45-Second Attendance Marking Portal</h3>
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                  Select a lecture to open attendance sheet (defaults everyone present, 1-tap absentee toggle)
+                </p>
+              </div>
+            </div>
 
-      {/* Semester Lecture Calendar (Visible to All Roles) */}
-      <LectureCalendar />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <select
+                className="form-input"
+                style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto' }}
+                onChange={(e) => {
+                  const selected = todaysLectures.find((l) => l._id === e.target.value);
+                  if (selected) setActiveFastMarkLecture(selected);
+                }}
+                defaultValue=""
+              >
+                <option value="" disabled>-- Select Lecture to Mark Attendance --</option>
+                {todaysLectures.slice(0, 10).map((l) => (
+                  <option key={l._id} value={l._id}>
+                    {new Date(l.date).toLocaleDateString()} — {l.courseId?.code || 'CS'} ({l.status})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fast Attendance Sheet Mode */}
+      {activeFastMarkLecture ? (
+        <FastAttendanceSheet
+          lecture={activeFastMarkLecture}
+          onBack={() => setActiveFastMarkLecture(null)}
+          onSubmitted={() => {
+            setActiveFastMarkLecture(null);
+            fetchLecturesForMarking();
+          }}
+        />
+      ) : (
+        <>
+          {/* Student Dedicated View */}
+          {user?.role === 'student' && <StudentAttendanceSummary />}
+
+          {/* Teacher / Owner Class-Wide Attendance Matrix */}
+          {(user?.role === 'teacher' || user?.role === 'owner') && <CourseAttendanceReport />}
+
+          {/* Timetable Grid & Lecture Calendar */}
+          <TimetableGrid />
+          <LectureCalendar />
+        </>
+      )}
 
       {/* Owner User Directory Card */}
-      {user?.role === 'owner' && (
+      {user?.role === 'owner' && !activeFastMarkLecture && (
         <div style={{
           backgroundColor: '#FFFFFF',
           borderRadius: 'var(--radius-md)',
@@ -130,14 +208,14 @@ export const DashboardPage = () => {
               Class Accounts Directory (54 Real Students + Teachers)
             </h3>
             <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Total Records: <strong>{usersList.length}</strong>
+              Total Accounts: <strong>{usersList.length}</strong>
             </span>
           </div>
 
           {loadingUsers ? (
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Loading account roster...</p>
           ) : (
-            <div style={{ overflowX: 'auto', maxHeight: '350px' }}>
+            <div style={{ overflowX: 'auto', maxHeight: '320px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
                 <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-main)', zIndex: 1 }}>
                   <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color)' }}>
