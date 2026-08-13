@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import courseRoutes from './routes/courseRoutes.js';
+import timetableRoutes from './routes/timetableRoutes.js';
+import lectureRoutes from './routes/lectureRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 
 dotenv.config();
@@ -29,6 +32,9 @@ app.use(express.json());
 app.use('/api/v1/health', healthRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/courses', courseRoutes);
+app.use('/api/v1/timetable', timetableRoutes);
+app.use('/api/v1/lectures', lectureRoutes);
 
 // Global 404 Handler
 app.use((req, res) => {
