@@ -9,11 +9,15 @@ import { StudentAttendanceSummary } from '../components/StudentAttendanceSummary
 import { CourseAttendanceReport } from '../components/CourseAttendanceReport';
 import { PeerVotingWidget } from '../components/PeerVotingWidget';
 import { TeacherDisputeQueue } from '../components/TeacherDisputeQueue';
-import { Shield, User, GraduationCap, UserPlus, CheckCircle2, RefreshCw, CheckSquare, Sparkles } from 'lucide-react';
+import { AssessmentManager } from '../components/AssessmentManager';
+import { StudentCourseworkList } from '../components/StudentCourseworkList';
+import { TeacherGradingMatrix } from '../components/TeacherGradingMatrix';
+import { Shield, User, GraduationCap, UserPlus, CheckCircle2, RefreshCw, CheckSquare, Sparkles, PlusCircle } from 'lucide-react';
 
 export const DashboardPage = () => {
   const { user } = useAuth();
   const [showBulkModal, setShowBulkModal] = useState(false);
+  const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [usersList, setUsersList] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [generatingLectures, setGeneratingLectures] = useState(false);
@@ -92,27 +96,40 @@ export const DashboardPage = () => {
           </p>
         </div>
 
-        {user?.role === 'owner' && (
-          <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          {(user?.role === 'teacher' || user?.role === 'owner') && (
             <button
-              onClick={handleGenerateLectures}
-              disabled={generatingLectures}
-              className="btn btn-secondary"
+              onClick={() => setShowAssessmentModal(!showAssessmentModal)}
+              className="btn btn-outline"
               style={{ padding: '10px 16px' }}
             >
-              <RefreshCw size={16} className={generatingLectures ? 'spin' : ''} />
-              <span>{generatingLectures ? 'Generating...' : 'Auto-Generate Lectures'}</span>
+              <PlusCircle size={16} />
+              <span>{showAssessmentModal ? 'Hide Entry Form' : '+ New Assignment / Quiz'}</span>
             </button>
-            <button
-              onClick={() => setShowBulkModal(true)}
-              className="btn btn-primary"
-              style={{ padding: '10px 18px' }}
-            >
-              <UserPlus size={18} />
-              <span>Bulk Student Import</span>
-            </button>
-          </div>
-        )}
+          )}
+
+          {user?.role === 'owner' && (
+            <>
+              <button
+                onClick={handleGenerateLectures}
+                disabled={generatingLectures}
+                className="btn btn-secondary"
+                style={{ padding: '10px 16px' }}
+              >
+                <RefreshCw size={16} className={generatingLectures ? 'spin' : ''} />
+                <span>{generatingLectures ? 'Generating...' : 'Auto-Generate Lectures'}</span>
+              </button>
+              <button
+                onClick={() => setShowBulkModal(true)}
+                className="btn btn-primary"
+                style={{ padding: '10px 18px' }}
+              >
+                <UserPlus size={18} />
+                <span>Bulk Student Import</span>
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {actionMessage && (
@@ -126,6 +143,11 @@ export const DashboardPage = () => {
         }}>
           {actionMessage}
         </div>
+      )}
+
+      {/* Teacher / Owner Assessment Publisher Component */}
+      {showAssessmentModal && (user?.role === 'teacher' || user?.role === 'owner') && (
+        <AssessmentManager onCreated={() => setShowAssessmentModal(false)} />
       )}
 
       {/* Peer Validation Widget (For Students who are peer voters) */}
@@ -187,8 +209,16 @@ export const DashboardPage = () => {
         />
       ) : (
         <>
-          {/* Student Dedicated View */}
-          {user?.role === 'student' && <StudentAttendanceSummary />}
+          {/* Student Dedicated Views */}
+          {user?.role === 'student' && (
+            <>
+              <StudentAttendanceSummary />
+              <StudentCourseworkList />
+            </>
+          )}
+
+          {/* Teacher / Owner Grading Matrix */}
+          {(user?.role === 'teacher' || user?.role === 'owner') && <TeacherGradingMatrix />}
 
           {/* Teacher / Owner Escalated Dispute Queue */}
           {(user?.role === 'teacher' || user?.role === 'owner') && <TeacherDisputeQueue />}
