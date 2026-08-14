@@ -1,8 +1,4 @@
 import mongoose from 'mongoose';
-import dns from 'dns';
-
-// Use Google/Cloudflare public DNS to bypass local ISP/router SRV lookup timeouts
-dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 export const connectDB = async () => {
   try {
@@ -11,7 +7,9 @@ export const connectDB = async () => {
       console.warn('⚠️ MONGODB_URI is not defined in environment. Server starting without DB connection.');
       return;
     }
-    const conn = await mongoose.connect(connStr);
+    const conn = await mongoose.connect(connStr, {
+      serverSelectionTimeoutMS: 10000,
+    });
     console.log(`✅ MongoDB Atlas Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);

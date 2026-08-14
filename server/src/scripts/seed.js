@@ -1,14 +1,11 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import dns from 'dns';
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import { Enrollment } from '../models/Enrollment.js';
 import { TimetableSlot } from '../models/TimetableSlot.js';
 import { Lecture } from '../models/Lecture.js';
 
-// Set public DNS servers for MongoDB Atlas SRV resolution
-dns.setServers(['8.8.8.8', '1.1.1.1']);
 dotenv.config();
 
 const realStudentsData = [
@@ -79,13 +76,17 @@ const teachersData = [
 
 const seedData = async () => {
   try {
-    if (!process.env.MONGODB_URI) {
-      console.error('❌ Cannot seed without MONGODB_URI in environment variables.');
-      process.exit(1);
-    }
+    const directUri = "mongodb://eumsyedasad14_db_user:QvBWyzG0fXdawsSQ@ac-x53x6do-shard-00-00.sjjmybr.mongodb.net:27017/emu_db?ssl=true&authSource=admin&directConnection=true";
 
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ Connected to MongoDB Atlas for Seeding Real Section Data...');
+    try {
+      await mongoose.connect(directUri, { serverSelectionTimeoutMS: 5000 });
+      console.log('✅ Connected to MongoDB Atlas via Direct Host!');
+    } catch (err) {
+      console.warn('⚠️ Direct host connection failed, trying SRV string...');
+      const connStr = process.env.MONGODB_URI || "mongodb+srv://eumsyedasad14_db_user:QvBWyzG0fXdawsSQ@cluster0.sjjmybr.mongodb.net/emu_db?retryWrites=true&w=majority";
+      await mongoose.connect(connStr, { serverSelectionTimeoutMS: 5000 });
+      console.log('✅ Connected to MongoDB Atlas via SRV!');
+    }
 
     // Clear existing collections
     await User.deleteMany({});
@@ -152,10 +153,9 @@ const seedData = async () => {
         email: s.email,
         passwordHash: defaultPasswordHash,
         role: 'student',
-        otpVerified: s.rollNumber === 'COSC231122114', // Pre-verify Shah G's student account for quick testing
+        otpVerified: s.rollNumber === 'COSC231122114',
       });
 
-      // Enroll in all 6 courses
       for (const courseId of Object.values(courseDocMap)) {
         await Enrollment.create({ studentId: student._id, courseId });
       }
@@ -202,8 +202,8 @@ const seedData = async () => {
     console.log(`📅 Created ${slotDocs.length} Recurring Timetable Slots matching official grid.`);
 
     // 6. Generate Dated Lecture Instances for the Semester (16 Weeks starting from Aug 2026)
-    const startDate = new Date('2026-08-10'); // Monday of start week
-    const endDate = new Date('2026-11-27');   // 16 weeks ahead
+    const startDate = new Date('2026-08-10');
+    const endDate = new Date('2026-11-27');
     const dayNameMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     let lectureCount = 0;
@@ -231,7 +231,7 @@ const seedData = async () => {
     console.log('------------------------------------------------------------------------');
     console.log(`Owner Account:   OWNER-01 / Password123!`);
     console.log(`Shah G Student:  COSC231122114 / Password123! (Pre-verified)`);
-    console.log(`Other Students:  COSC231122102 ... COSC231122161 / Password123! (OTP on 1st login)`);
+    console.log(`Other Students:  COSC231122102 ... COSC231122161 / Password123!`);
     console.log(`Teacher Login:   TCH-CC01 / Password123! (Dr. Wasif Akbar)`);
     console.log('------------------------------------------------------------------------');
 
