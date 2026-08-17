@@ -13,6 +13,7 @@ import {
   X,
   ArrowLeft,
   LogIn,
+  LayoutDashboard,
   Globe,
 } from 'lucide-react';
 
@@ -98,13 +99,12 @@ export const Navbar = ({
                   fontWeight: '800',
                   color: 'var(--eum-maroon)',
                   lineHeight: 1.15,
-                  letterSpacing: '0.2px',
+                  letterSpacing: '-0.3px',
                 }}
               >
                 EMU Platform
               </div>
               <div
-                className="hide-on-mobile"
                 style={{
                   fontSize: '0.72rem',
                   color: 'var(--text-muted)',
@@ -165,13 +165,23 @@ export const Navbar = ({
           {/* Landing Page Action: Login Button & Mobile Menu Toggle */}
           {variant === 'landing' && (
             <>
-              <button
-                onClick={onGoToLogin}
-                className="btn btn-primary desktop-nav"
-                style={{ padding: '8px 18px', fontSize: '0.88rem' }}
-              >
-                <LogIn size={15} /> Log In to Portal
-              </button>
+              {user ? (
+                <button
+                  onClick={onGoToLogin}
+                  className="btn btn-primary desktop-nav"
+                  style={{ padding: '8px 18px', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <LayoutDashboard size={15} /> Go to Dashboard
+                </button>
+              ) : (
+                <button
+                  onClick={onGoToLogin}
+                  className="btn btn-primary desktop-nav"
+                  style={{ padding: '8px 18px', fontSize: '0.88rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <LogIn size={15} /> Log In to Portal
+                </button>
+              )}
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -214,14 +224,11 @@ export const Navbar = ({
             <>
               <div className="user-profile-header" style={{ textAlign: 'right' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
-                  <span style={{ fontWeight: '600', fontSize: '0.86rem', color: 'var(--text-dark)' }}>
+                  <span style={{ fontWeight: '600', fontSize: '0.88rem', color: 'var(--text-dark)' }}>
                     {user.name}
                   </span>
                   {getRoleBadge(user.role)}
                 </div>
-                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                  {user.rollNumber}
-                </span>
               </div>
 
               {/* Mobile Role Badge */}
@@ -343,21 +350,47 @@ export const Navbar = ({
             ✦ Feedback & Pilot Desk
           </a>
 
-          <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              if (onGoToLogin) onGoToLogin();
-            }}
-            className="btn btn-primary"
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '0.95rem',
-              marginTop: '8px',
-            }}
-          >
-            <LogIn size={16} /> Log In to Portal
-          </button>
+          {user ? (
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onGoToLogin) onGoToLogin();
+              }}
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                padding: '12px',
+                fontSize: '0.95rem',
+                marginTop: '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              <LayoutDashboard size={16} /> Open Dashboard ({user.name})
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (onGoToLogin) onGoToLogin();
+              }}
+              className="btn btn-primary"
+              style={{
+                width: '100%',
+                padding: '12px',
+                fontSize: '0.95rem',
+                marginTop: '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              <LogIn size={16} /> Log In to Portal
+            </button>
+          )}
         </div>
       )}
     </header>

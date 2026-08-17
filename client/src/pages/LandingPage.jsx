@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { Navbar } from '../components/Navbar';
 import { Hero3DElement } from '../components/Hero3DElement';
 import { FaqAccordion } from '../components/FaqAccordion';
@@ -33,10 +34,12 @@ import {
   Send,
   MapPin,
   FileText,
+  LayoutDashboard,
 } from 'lucide-react';
 
 export const LandingPage = ({ onGoToApp }) => {
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('students');
   const [demoTab, setDemoTab] = useState('register'); // 'register' or 'matrix'
   const [contactEmail, setContactEmail] = useState('');
@@ -173,9 +176,17 @@ export const LandingPage = ({ onGoToApp }) => {
               <button
                 onClick={onGoToApp}
                 className="btn btn-primary"
-                style={{ padding: '10px 22px', fontSize: '0.92rem' }}
+                style={{ padding: '10px 22px', fontSize: '0.92rem', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
               >
-                Log In with Roll Number <ArrowRight size={16} />
+                {user ? (
+                  <>
+                    <LayoutDashboard size={16} /> Open My Dashboard ({user.name.split(' ')[0]}) <ArrowRight size={16} />
+                  </>
+                ) : (
+                  <>
+                    Log In with Roll Number <ArrowRight size={16} />
+                  </>
+                )}
               </button>
 
               <a
