@@ -44,7 +44,7 @@ export const FaqAccordion = () => {
           <div
             key={idx}
             style={{
-              backgroundColor: '#FFFFFF',
+              backgroundColor: 'var(--bg-surface)',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border-color)',
               marginBottom: '12px',

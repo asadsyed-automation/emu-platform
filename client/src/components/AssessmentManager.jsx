@@ -65,7 +65,7 @@ export const AssessmentManager = ({ onCreated }) => {
 
   return (
     <div style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'var(--bg-surface)',
       borderRadius: 'var(--radius-lg)',
       padding: '24px',
       boxShadow: 'var(--shadow-sm)',

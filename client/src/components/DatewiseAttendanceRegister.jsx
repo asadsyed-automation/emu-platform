@@ -86,7 +86,7 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
 
   return (
     <div style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'var(--bg-surface)',
       borderRadius: 'var(--radius-lg)',
       padding: '28px',
       boxShadow: 'var(--shadow-sm)',
@@ -197,8 +197,8 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
               </thead>
               <tbody>
                 {students.map((s, idx) => (
-                  <tr key={s.studentId} style={{ backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#F9F9F7' }}>
-                    <td style={{ padding: '4px', border: '1px solid #ddd', fontWeight: '600' }}>{idx + 1}</td>
+                  <tr key={s.studentId} style={{ backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-subtle)' }}>
+                    <td style={{ padding: '4px', border: '1px solid var(--border-color)', fontWeight: '600' }}>{idx + 1}</td>
                     <td style={{ padding: '4px 6px', border: '1px solid #ddd', textAlign: 'left', fontWeight: '700', color: 'var(--eum-maroon)' }}>
                       {s.rollNumber}
                     </td>

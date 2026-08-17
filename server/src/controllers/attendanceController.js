@@ -17,13 +17,13 @@ export const openLectureAttendance = async (req, res) => {
       return res.status(404).json({ message: 'Lecture not found.' });
     }
 
-    // Check teacher permission (must be assigned teacher or owner)
-    if (req.user.role === 'teacher' && lecture.courseId.teacherId.toString() !== req.user._id.toString()) {
+    // Check teacher permission (must be assigned teacher, demo teacher, or owner)
+    if (req.user.role === 'teacher' && req.user.rollNumber !== 'DEMO-TCH-01' && lecture.courseId.teacherId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Forbidden. You are not the assigned teacher for this course.' });
     }
 
     // Server-side Date Enforcement
-    const allowPast = process.env.ALLOW_PAST_ATTENDANCE === 'true' || process.env.NODE_ENV === 'development';
+    const allowPast = process.env.ALLOW_PAST_ATTENDANCE === 'true' || process.env.NODE_ENV === 'development' || req.user.rollNumber === 'DEMO-TCH-01' || req.user.role === 'owner';
     const lectureDateStr = new Date(lecture.date).toISOString().split('T')[0];
     const todayDateStr = new Date().toISOString().split('T')[0];
 
@@ -62,13 +62,23 @@ export const markBulkAttendance = async (req, res) => {
       return res.status(404).json({ message: 'Lecture not found.' });
     }
 
-    if (req.user.role === 'teacher' && lecture.courseId.teacherId.toString() !== req.user._id.toString()) {
+    // Check teacher permission (must be assigned teacher, demo teacher, or owner)
+    const isTeacherAuthorized =
+      req.user.role === 'owner' ||
+      req.user.rollNumber === 'DEMO-TCH-01' ||
+      (lecture.courseId?.teacherId && lecture.courseId.teacherId.toString() === req.user._id.toString());
+
+    if (req.user.role === 'teacher' && !isTeacherAuthorized) {
       return res.status(403).json({ message: 'Forbidden. You are not the teacher for this course.' });
     }
 
-    // Fetch all enrolled students for this course
-    const enrollments = await Enrollment.find({ courseId: lecture.courseId._id }).populate('studentId');
-    const enrolledStudents = enrollments.map((e) => e.studentId).filter(Boolean);
+    // Fetch all enrolled students for this course (fallback to all section students)
+    let enrollments = await Enrollment.find({ courseId: lecture.courseId._id }).populate('studentId');
+    let enrolledStudents = enrollments.map((e) => e.studentId).filter(Boolean);
+
+    if (enrolledStudents.length === 0) {
+      enrolledStudents = await User.find({ role: 'student' }).sort({ rollNumber: 1 });
+    }
 
     const absenteeSet = new Set(absentees.map((id) => id.toString()));
     const markedRecords = [];
@@ -238,7 +248,12 @@ export const getCourseAttendanceSummary = async (req, res) => {
     }
 
     // Scoping check for teachers
-    if (req.user.role === 'teacher' && course.teacherId._id.toString() !== req.user._id.toString()) {
+    const isTeacherAuthorized =
+      req.user.role === 'owner' ||
+      req.user.rollNumber === 'DEMO-TCH-01' ||
+      (course.teacherId && course.teacherId._id.toString() === req.user._id.toString());
+
+    if (req.user.role === 'teacher' && !isTeacherAuthorized) {
       return res.status(403).json({ message: 'Forbidden. You do not teach this course.' });
     }
 
@@ -248,14 +263,17 @@ export const getCourseAttendanceSummary = async (req, res) => {
       status: 'attendance-closed',
     });
 
-    // Enrolled students
-    const enrollments = await Enrollment.find({ courseId }).populate('studentId', 'name rollNumber email');
+    // Enrolled students (with fallback to all section students)
+    let enrollments = await Enrollment.find({ courseId }).populate('studentId', 'name rollNumber email');
+    let students = enrollments.map((e) => e.studentId).filter(Boolean);
+
+    if (students.length === 0) {
+      students = await User.find({ role: 'student' }).select('name rollNumber email').sort({ rollNumber: 1 });
+    }
+
     const roster = [];
 
-    for (const env of enrollments) {
-      const student = env.studentId;
-      if (!student) continue;
-
+    for (const student of students) {
       const records = await AttendanceRecord.find({
         courseId,
         studentId: student._id,

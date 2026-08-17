@@ -52,7 +52,7 @@ export const StudentCourseworkList = () => {
 
   return (
     <div style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'var(--bg-surface)',
       borderRadius: 'var(--radius-lg)',
       padding: '24px',
       boxShadow: 'var(--shadow-sm)',
@@ -100,7 +100,7 @@ export const StudentCourseworkList = () => {
                 {/* Submission Status Box */}
                 {sub ? (
                   <div style={{
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: 'var(--bg-surface)',
                     borderRadius: 'var(--radius-sm)',
                     padding: '10px 12px',
                     border: '1px solid var(--border-color)',

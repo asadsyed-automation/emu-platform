@@ -73,7 +73,7 @@ export const TeacherDisputeQueue = () => {
 
   return (
     <div style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'var(--bg-surface)',
       borderRadius: 'var(--radius-lg)',
       padding: '24px',
       boxShadow: 'var(--shadow-sm)',
@@ -180,7 +180,7 @@ export const TeacherDisputeQueue = () => {
                 <div style={{
                   margin: '12px 0',
                   padding: '10px 14px',
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: 'var(--bg-main)',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.88rem',
                   border: '1px solid var(--border-color)'
@@ -205,7 +205,7 @@ export const TeacherDisputeQueue = () => {
                   <div style={{
                     marginTop: '12px',
                     padding: '14px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: 'var(--bg-main)',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--eum-maroon)'
                   }}>

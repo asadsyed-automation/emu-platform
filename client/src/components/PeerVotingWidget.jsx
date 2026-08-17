@@ -41,7 +41,7 @@ export const PeerVotingWidget = () => {
 
   return (
     <div style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'var(--bg-surface)',
       borderRadius: 'var(--radius-lg)',
       padding: '20px 24px',
       boxShadow: 'var(--shadow-sm)',
@@ -87,7 +87,7 @@ export const PeerVotingWidget = () => {
               fontSize: '0.82rem',
               fontStyle: 'italic',
               color: 'var(--text-muted)',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: 'var(--bg-surface)',
               padding: '8px 10px',
               borderRadius: 'var(--radius-sm)',
               marginBottom: '12px',

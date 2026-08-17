@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
 import { OtpModal } from './components/OtpModal';
 import { LoginPage } from './pages/LoginPage';
@@ -10,6 +11,7 @@ import { Globe, LogIn } from 'lucide-react';
 const AppContent = () => {
   const { isAuthenticated, isOtpRequired, loading } = useAuth();
   const [viewMode, setViewMode] = useState('landing'); // 'landing' or 'app'
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   if (loading) {
     return (
@@ -28,49 +30,27 @@ const AppContent = () => {
     );
   }
 
-  // If user clicks "Log In to Portal" or is already authenticated
-  if (viewMode === 'landing' && !isAuthenticated) {
-    return <LandingPage onGoToApp={() => setViewMode('app')} />;
+  if (viewMode === 'landing') {
+    return (
+      <LandingPage
+        onGoToApp={() => setViewMode('app')}
+        isLoggedIn={isAuthenticated}
+      />
+    );
   }
 
   if (!isAuthenticated) {
     return (
-      <div>
-        {/* Banner to switch back to landing page */}
-        <div style={{
-          backgroundColor: 'var(--eum-green)',
-          color: '#FFFFFF',
-          padding: '8px 16px',
-          textAlign: 'center',
-          fontSize: '0.82rem',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <span>Viewing EMU Login Portal.</span>
-          <button
-            onClick={() => setViewMode('landing')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--eum-gold)',
-              cursor: 'pointer',
-              fontWeight: '700',
-              textDecoration: 'underline'
-            }}
-          >
-            ← View Landing Page
-          </button>
-        </div>
-        <LoginPage />
-      </div>
+      <LoginPage onBackToLanding={() => setViewMode('landing')} />
     );
   }
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
+      <Header
+        onGoHome={() => setViewMode('landing')}
+        onToggleSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+      />
       
       {/* Top Banner allowing logged in user to preview landing page */}
       <div className="no-print" style={{
@@ -92,7 +72,10 @@ const AppContent = () => {
       </div>
 
       <main style={{ flex: 1 }}>
-        <DashboardPage />
+        <DashboardPage
+          mobileSidebarOpen={mobileSidebarOpen}
+          onCloseMobileSidebar={() => setMobileSidebarOpen(false)}
+        />
       </main>
       {isOtpRequired && <OtpModal />}
     </div>
@@ -101,8 +84,11 @@ const AppContent = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
+

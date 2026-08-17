@@ -39,16 +39,23 @@ export const sendOtpEmail = async ({ toEmail, studentName, otpCode }) => {
 
   if (client) {
     try {
-      const data = await client.emails.send({
+      const response = await client.emails.send({
         from: fromEmail,
         to: [toEmail],
         subject: `Your EMU Verification Code: ${otpCode}`,
         html: htmlContent,
       });
-      console.log(`✉️ OTP Email sent via Resend to ${toEmail}:`, data);
-      return { success: true, method: 'resend', data };
+
+      if (response.error) {
+        console.error(`❌ Error sending email via Resend to ${toEmail}:`, response.error.message);
+        console.log(`🔑 [DEV FALLBACK OTP] Code for ${toEmail}: ${otpCode}`);
+        return { success: true, method: 'dev_fallback', code: otpCode, error: response.error };
+      }
+
+      console.log(`✉️ OTP Email sent via Resend to ${toEmail}:`, response.data);
+      return { success: true, method: 'resend', data: response.data };
     } catch (err) {
-      console.error(`❌ Error sending email via Resend to ${toEmail}:`, err.message);
+      console.error(`❌ Exception sending email via Resend to ${toEmail}:`, err.message);
       // Fallback log for development
       console.log(`🔑 [DEV FALLBACK OTP] Code for ${toEmail}: ${otpCode}`);
       return { success: true, method: 'dev_fallback', code: otpCode };

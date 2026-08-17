@@ -49,7 +49,7 @@ export const TimetableGrid = () => {
 
   return (
     <div style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'var(--bg-surface)',
       borderRadius: 'var(--radius-lg)',
       padding: '24px',
       boxShadow: 'var(--shadow-sm)',
@@ -162,7 +162,7 @@ export const TimetableGrid = () => {
                             <div
                               key={slot._id}
                               style={{
-                                backgroundColor: '#FFFFFF',
+                                backgroundColor: 'var(--bg-main)',
                                 borderRadius: 'var(--radius-sm)',
                                 padding: '12px 14px',
                                 border: '1px solid var(--border-color)',

@@ -60,7 +60,7 @@ export const StudentAttendanceSummary = () => {
             <div
               key={item.courseId}
               style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: 'var(--bg-surface)',
                 borderRadius: 'var(--radius-lg)',
                 padding: '20px',
                 boxShadow: 'var(--shadow-sm)',

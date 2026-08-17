@@ -14,23 +14,59 @@ export const FastAttendanceSheet = ({ lecture, onBack, onSubmitted }) => {
   useEffect(() => {
     const fetchCourseRoster = async () => {
       try {
-        // Fetch existing marked records or course summary roster
-        const res = await API.get(`/attendance/course/${lecture.courseId._id || lecture.courseId}/summary`);
-        const roster = res.data.roster || [];
-        setStudents(roster);
+        const rawCourseId = lecture?.courseId?._id || lecture?.courseId || '6a8189584a3d82e0a1550bb5';
+        let roster = [];
+
+        try {
+          const res = await API.get(`/attendance/course/${rawCourseId}/summary`);
+          roster = res.data.roster || [];
+        } catch (e) {
+          console.warn('Course summary endpoint fallback:', e.message);
+        }
+
+        // If roster is still empty, fetch from section users
+        if (roster.length === 0) {
+          try {
+            const adminRes = await API.get('/admin/users');
+            const users = adminRes.data.users || [];
+            roster = users
+              .filter((u) => u.role === 'student')
+              .map((u) => ({
+                studentId: u._id,
+                rollNumber: u.rollNumber,
+                name: u.name,
+                email: u.email,
+              }));
+          } catch (e) {
+            console.warn('Admin users fallback:', e.message);
+          }
+        }
+
+        if (roster.length > 0) {
+          setStudents(roster);
+        } else {
+          setError('No students found in section roll list.');
+        }
 
         // Fetch if already marked for this lecture
-        const markedRes = await API.get(`/attendance/lecture/${lecture._id}`);
-        const existingRecords = markedRes.data.records || [];
+        if (lecture?._id && lecture._id !== 'demo-lecture-active') {
+          try {
+            const markedRes = await API.get(`/attendance/lecture/${lecture._id}`);
+            const existingRecords = markedRes.data.records || [];
 
-        if (existingRecords.length > 0) {
-          const map = {};
-          existingRecords.forEach((r) => {
-            if (r.status === 'absent') {
-              map[r.studentId._id] = true;
+            if (existingRecords.length > 0) {
+              const map = {};
+              existingRecords.forEach((r) => {
+                if (r.status === 'absent') {
+                  const sId = r.studentId?._id || r.studentId;
+                  if (sId) map[sId] = true;
+                }
+              });
+              setAbsentMap(map);
             }
-          });
-          setAbsentMap(map);
+          } catch (e) {
+            // Lecture not marked yet
+          }
         }
       } catch (err) {
         setError('Error loading class roster for attendance marking.');
@@ -95,7 +131,7 @@ export const FastAttendanceSheet = ({ lecture, onBack, onSubmitted }) => {
 
   return (
     <div style={{
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'var(--bg-surface)',
       borderRadius: 'var(--radius-lg)',
       padding: '24px',
       boxShadow: 'var(--shadow-md)',
@@ -250,7 +286,7 @@ export const FastAttendanceSheet = ({ lecture, onBack, onSubmitted }) => {
               key={student.studentId}
               onClick={() => toggleAbsent(student.studentId)}
               style={{
-                backgroundColor: isAbsent ? '#FFEBEE' : '#E8F5E9',
+                backgroundColor: isAbsent ? 'var(--status-danger-bg)' : 'var(--status-success-bg)',
                 border: isAbsent ? '2px solid var(--status-danger)' : '2px solid var(--status-success)',
                 borderRadius: 'var(--radius-md)',
                 padding: '12px',

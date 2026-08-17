@@ -1,6 +1,7 @@
 import { Submission } from '../models/Submission.js';
 import { AssignmentQuiz } from '../models/AssignmentQuiz.js';
 import { Enrollment } from '../models/Enrollment.js';
+import { User } from '../models/User.js';
 
 /**
  * @desc Submit or update Google Drive URL (Student only)
@@ -89,7 +90,13 @@ export const getAssessmentSubmissionMatrix = async (req, res) => {
       return res.status(404).json({ message: 'Assessment not found.' });
     }
 
-    const enrollments = await Enrollment.find({ courseId: assessment.courseId._id }).populate('studentId', 'name rollNumber email');
+    let enrollments = await Enrollment.find({ courseId: assessment.courseId._id }).populate('studentId', 'name rollNumber email');
+    let students = enrollments.map((e) => e.studentId).filter(Boolean);
+
+    if (students.length === 0) {
+      students = await User.find({ role: 'student' }).select('name rollNumber email').sort({ rollNumber: 1 });
+    }
+
     const existingSubmissions = await Submission.find({ assignmentQuizId: id });
     const subMap = {};
     existingSubmissions.forEach((s) => {
@@ -100,10 +107,7 @@ export const getAssessmentSubmissionMatrix = async (req, res) => {
     const now = new Date();
     const isPastDeadline = now > new Date(assessment.deadline);
 
-    for (const env of enrollments) {
-      const student = env.studentId;
-      if (!student) continue;
-
+    for (const student of students) {
       const sub = subMap[student._id.toString()];
       let status = sub ? sub.status : isPastDeadline ? 'missing' : 'pending';
 

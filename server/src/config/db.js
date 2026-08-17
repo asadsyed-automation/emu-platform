@@ -11,6 +11,7 @@ export const connectDB = async () => {
       serverSelectionTimeoutMS: 10000,
     });
     console.log(`✅ MongoDB Atlas Connected: ${conn.connection.host}`);
+    return conn;
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
     if (process.env.NODE_ENV === 'production') {

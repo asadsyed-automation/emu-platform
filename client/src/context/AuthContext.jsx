@@ -31,8 +31,37 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, [token]);
 
+  const verifyStep1 = async (arg1, arg2, arg3) => {
+    let role = null;
+    let name = arg1;
+    let password = arg2;
+    if (arg3 !== undefined) {
+      role = arg1;
+      name = arg2;
+      password = arg3;
+    }
+    const res = await API.post('/auth/verify-step1', { role, name, password });
+    return res.data;
+  };
+
+  const verifyStep2Email = async (userId, email) => {
+    const res = await API.post('/auth/verify-step2-email', { userId, email });
+    return res.data;
+  };
+
+  const verifyStep3Otp = async (userId, otp) => {
+    const res = await API.post('/auth/verify-step3-otp', { userId, otp });
+    const { token: authToken, user: userData } = res.data;
+    setToken(authToken);
+    setUser(userData);
+    localStorage.setItem('emu_token', authToken);
+    localStorage.setItem('emu_user', JSON.stringify(userData));
+    return res.data;
+  };
+
   const login = async (identifier, password) => {
     const res = await API.post('/auth/login', {
+      name: identifier,
       rollNumber: identifier,
       password,
     });
@@ -73,6 +102,9 @@ export const AuthProvider = ({ children }) => {
         user,
         token,
         loading,
+        verifyStep1,
+        verifyStep2Email,
+        verifyStep3Otp,
         login,
         verifyOtp,
         resendOtp,

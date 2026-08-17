@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { connectDB } from '../config/db.js';
 import { User } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import { Enrollment } from '../models/Enrollment.js';
@@ -76,17 +77,7 @@ const teachersData = [
 
 const seedData = async () => {
   try {
-    const directUri = "mongodb://eumsyedasad14_db_user:QvBWyzG0fXdawsSQ@ac-x53x6do-shard-00-00.sjjmybr.mongodb.net:27017/emu_db?ssl=true&authSource=admin&directConnection=true";
-
-    try {
-      await mongoose.connect(directUri, { serverSelectionTimeoutMS: 5000 });
-      console.log('✅ Connected to MongoDB Atlas via Direct Host!');
-    } catch (err) {
-      console.warn('⚠️ Direct host connection failed, trying SRV string...');
-      const connStr = process.env.MONGODB_URI || "mongodb+srv://eumsyedasad14_db_user:QvBWyzG0fXdawsSQ@cluster0.sjjmybr.mongodb.net/emu_db?retryWrites=true&w=majority";
-      await mongoose.connect(connStr, { serverSelectionTimeoutMS: 5000 });
-      console.log('✅ Connected to MongoDB Atlas via SRV!');
-    }
+    await connectDB();
 
     // Clear existing collections
     await User.deleteMany({});
@@ -96,31 +87,56 @@ const seedData = async () => {
     await Lecture.deleteMany({});
     console.log('🧹 Cleared existing users, courses, enrollments, slots, and lectures.');
 
-    const defaultPasswordHash = await User.hashPassword('Password123!');
-
-    // 1. Create Owner Account (Shah G)
+    // 1. Create Real Owner Account (Shah G)
+    const ownerPasswordHash = await User.hashPassword('OWNER-01');
     const owner = await User.create({
       rollNumber: 'OWNER-01',
       name: 'Asad Syed (Shah G)',
       email: 'owner@emerson.edu.pk',
-      passwordHash: defaultPasswordHash,
+      passwordHash: ownerPasswordHash,
       role: 'owner',
       otpVerified: true,
     });
     console.log(`👑 Owner Account Created: OWNER-01 (${owner.name})`);
 
-    // 2. Create Teachers Map
+    // 1b. Create Fictional Sandbox Demo Admin
+    const demoAdminPassHash = await User.hashPassword('DEMO-ADM-01');
+    const demoAdmin = await User.create({
+      rollNumber: 'DEMO-ADM-01',
+      name: 'Demo Admin (Portal Lead)',
+      email: 'demo.admin@emerson.test',
+      passwordHash: demoAdminPassHash,
+      role: 'owner',
+      otpVerified: true,
+    });
+    console.log(`👑 Demo Admin Created: DEMO-ADM-01 (${demoAdmin.name})`);
+
+    // 2. Create Teachers Map - Password is teacher's rollNumber (e.g. TCH-CC01)
     const teacherDocMap = {};
     for (const t of teachersData) {
+      const teacherPasswordHash = await User.hashPassword(t.rollNumber);
       const teacher = await User.create({
         ...t,
-        passwordHash: defaultPasswordHash,
+        passwordHash: teacherPasswordHash,
         role: 'teacher',
         otpVerified: true,
       });
       teacherDocMap[t.name] = teacher._id;
-      console.log(`👨‍🏫 Teacher Created: ${teacher.name} (${teacher.email})`);
+      console.log(`👨‍🏫 Teacher Created: ${teacher.name} (${teacher.email}) - Roll/Pass: ${teacher.rollNumber}`);
     }
+
+    // 2b. Create Fictional Sandbox Demo Teacher
+    const demoTeacherPassHash = await User.hashPassword('DEMO-TCH-01');
+    const demoTeacher = await User.create({
+      rollNumber: 'DEMO-TCH-01',
+      name: 'Prof. Tariq Demo (Faculty)',
+      email: 'demo.faculty@emerson.test',
+      passwordHash: demoTeacherPassHash,
+      role: 'teacher',
+      otpVerified: true,
+    });
+    teacherDocMap['Prof. Tariq Demo (Faculty)'] = demoTeacher._id;
+    console.log(`👨‍🏫 Demo Teacher Created: DEMO-TCH-01 (${demoTeacher.name})`);
 
     // 3. Create Courses
     const coursesDefinition = [
@@ -145,23 +161,39 @@ const seedData = async () => {
     }
 
     // 4. Create Students and Enroll in All Courses
-    let studentCount = 0;
-    for (const s of realStudentsData) {
-      const student = await User.create({
+    const studentUserDocs = await Promise.all(
+      realStudentsData.map(async (s) => ({
         rollNumber: s.rollNumber,
         name: s.name,
         email: s.email,
-        passwordHash: defaultPasswordHash,
+        passwordHash: await User.hashPassword(s.rollNumber),
         role: 'student',
-        otpVerified: s.rollNumber === 'COSC231122114',
-      });
+        otpVerified: false,
+      }))
+    );
 
+    // 4b. Add Fictional Sandbox Demo Student
+    const demoStudentDoc = {
+      rollNumber: 'DEMO-STU-01',
+      name: 'Demo Student (Zaid Khan)',
+      email: 'demo.student@emerson.test',
+      passwordHash: await User.hashPassword('DEMO-STU-01'),
+      role: 'student',
+      otpVerified: true,
+    };
+    studentUserDocs.push(demoStudentDoc);
+
+    const insertedStudents = await User.insertMany(studentUserDocs);
+
+    // Build all student enrollment documents
+    const enrollmentDocs = [];
+    for (const student of insertedStudents) {
       for (const courseId of Object.values(courseDocMap)) {
-        await Enrollment.create({ studentId: student._id, courseId });
+        enrollmentDocs.push({ studentId: student._id, courseId });
       }
-      studentCount++;
     }
-    console.log(`🎓 Created & Enrolled ${studentCount} Students in all 6 courses.`);
+    await Enrollment.insertMany(enrollmentDocs);
+    console.log(`🎓 Created & Enrolled ${insertedStudents.length} Students (including Demo Student) in all 6 courses.`);
 
     // 5. Seed 15 Timetable Slots matching Official EUM Grid
     const slotsDefinition = [
@@ -187,18 +219,16 @@ const seedData = async () => {
       { courseKey: 'ENG', dayOfWeek: 'Friday', startTime: '14:45', endTime: '16:00', room: 'BOT-B1-F-102', isLab: false },
     ];
 
-    const slotDocs = [];
-    for (const slotDef of slotsDefinition) {
-      const slot = await TimetableSlot.create({
-        courseId: courseDocMap[slotDef.courseKey],
-        dayOfWeek: slotDef.dayOfWeek,
-        startTime: slotDef.startTime,
-        endTime: slotDef.endTime,
-        room: slotDef.room,
-        isLab: slotDef.isLab,
-      });
-      slotDocs.push(slot);
-    }
+    const slotObjects = slotsDefinition.map((slotDef) => ({
+      courseId: courseDocMap[slotDef.courseKey],
+      dayOfWeek: slotDef.dayOfWeek,
+      startTime: slotDef.startTime,
+      endTime: slotDef.endTime,
+      room: slotDef.room,
+      isLab: slotDef.isLab,
+    }));
+
+    const slotDocs = await TimetableSlot.insertMany(slotObjects);
     console.log(`📅 Created ${slotDocs.length} Recurring Timetable Slots matching official grid.`);
 
     // 6. Generate Dated Lecture Instances for the Semester (16 Weeks starting from Aug 2026)
@@ -206,7 +236,7 @@ const seedData = async () => {
     const endDate = new Date('2026-11-27');
     const dayNameMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-    let lectureCount = 0;
+    const lectureDocs = [];
     const curDate = new Date(startDate);
     curDate.setHours(0, 0, 0, 0);
 
@@ -215,24 +245,25 @@ const seedData = async () => {
       const matchingSlots = slotDocs.filter((s) => s.dayOfWeek === dayName);
 
       for (const slot of matchingSlots) {
-        await Lecture.create({
+        lectureDocs.push({
           courseId: slot.courseId,
           timetableSlotId: slot._id,
           date: new Date(curDate),
           status: 'scheduled',
         });
-        lectureCount++;
       }
       curDate.setDate(curDate.getDate() + 1);
     }
-    console.log(`⏱️ Auto-Generated ${lectureCount} Dated Lecture Instances across the 16-week semester!`);
+
+    await Lecture.insertMany(lectureDocs);
+    console.log(`⏱️ Auto-Generated ${lectureDocs.length} Dated Lecture Instances across the 16-week semester!`);
 
     console.log('\n✨ Database Seeding Complete!');
     console.log('------------------------------------------------------------------------');
-    console.log(`Owner Account:   OWNER-01 / Password123!`);
-    console.log(`Shah G Student:  COSC231122114 / Password123! (Pre-verified)`);
-    console.log(`Other Students:  COSC231122102 ... COSC231122161 / Password123!`);
-    console.log(`Teacher Login:   TCH-CC01 / Password123! (Dr. Wasif Akbar)`);
+    console.log(`Owner Account:   Name: "Asad Syed (Shah G)" | Password: OWNER-01`);
+    console.log(`Teacher Login:   Name: "Dr. Wasif Akbar"    | Password: TCH-CC01`);
+    console.log(`Shah G Student:  Name: "Syed Asad Ali Raza Shah" | Password: COSC231122114 | Email: asadraza5670@gmail.com`);
+    console.log(`Other Students:  Name on roll list          | Password: <their roll number>`);
     console.log('------------------------------------------------------------------------');
 
     process.exit(0);
