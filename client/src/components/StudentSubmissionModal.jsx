@@ -60,8 +60,17 @@ export const StudentSubmissionModal = ({ assessment, existingSubmission, onClose
             Deadline: <strong>{new Date(assessment.deadline).toLocaleString()}</strong> • Tag: <span className="badge badge-teacher">{assessment.examPeriod} #{assessment.sequenceIndex}</span>
           </div>
           {isPastDeadline && (
-            <div style={{ color: 'var(--status-danger)', fontWeight: '600', marginTop: '6px' }}>
-              ⚠️ Deadline has passed! Submissions now will be recorded as <strong>LATE</strong>.
+            <div style={{
+              backgroundColor: 'var(--status-danger-bg)',
+              color: 'var(--status-danger)',
+              padding: '10px 12px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.82rem',
+              fontWeight: '600',
+              marginTop: '8px',
+              border: '1px solid rgba(179, 55, 44, 0.25)',
+            }}>
+              ⚠️ Deadline has passed! The submission portal is closed for this assessment and marked as MISSED.
             </div>
           )}
         </div>
@@ -88,6 +97,7 @@ export const StudentSubmissionModal = ({ assessment, existingSubmission, onClose
               placeholder="https://drive.google.com/file/d/..."
               value={driveUrl}
               onChange={(e) => setDriveUrl(e.target.value)}
+              disabled={isPastDeadline}
               required
             />
           </div>
@@ -104,8 +114,13 @@ export const StudentSubmissionModal = ({ assessment, existingSubmission, onClose
             <button type="button" onClick={onClose} className="btn btn-outline">
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Submitting...' : 'Save Drive Link'}
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading || isPastDeadline}
+              style={{ opacity: isPastDeadline ? 0.5 : 1, cursor: isPastDeadline ? 'not-allowed' : 'pointer' }}
+            >
+              {isPastDeadline ? 'Submissions Closed' : loading ? 'Submitting...' : 'Save Drive Link'}
             </button>
           </div>
         </form>

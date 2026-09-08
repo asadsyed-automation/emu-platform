@@ -743,38 +743,128 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                   </div>
                 )}
 
-                {/* TAB 2: ADMIN TIMETABLE MANAGER */}
+                {/* TAB: OWNER FAST ATTENDANCE MARKING */}
+                {activeTab === 'attendance' && (
+                  <div className="animate-fade-in">
+                    <div
+                      style={{
+                        backgroundColor: 'var(--bg-surface)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '20px 24px',
+                        border: '1px solid var(--border-color)',
+                        marginBottom: '20px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '14px',
+                      }}
+                    >
+                      <div>
+                        <h3 style={{ fontSize: '1.15rem', color: 'var(--eum-maroon)', marginBottom: '3px' }}>
+                          Fast Lecture Attendance Sheet Launcher (Admin Access)
+                        </h3>
+                        <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
+                          Select any scheduled course lecture slot to open & mark section attendance:
+                        </p>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <select
+                          className="form-input"
+                          style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto' }}
+                          onChange={(e) => {
+                            const selected = todaysLectures.find((l) => l._id === e.target.value);
+                            if (selected) setActiveFastMarkLecture(selected);
+                          }}
+                          defaultValue=""
+                        >
+                          <option value="" disabled>-- Select Lecture Slot --</option>
+                          {todaysLectures.slice(0, 25).map((l) => (
+                            <option key={l._id} value={l._id}>
+                              {new Date(l.date).toLocaleDateString()} — {l.courseId?.code || 'CS'} ({l.status})
+                            </option>
+                          ))}
+                        </select>
+
+                        <button
+                          onClick={() => handleLaunchDemoAttendance()}
+                          className="btn btn-primary"
+                          style={{ padding: '8px 16px', fontSize: '0.86rem' }}
+                        >
+                          <Zap size={14} /> Mark Fast Attendance
+                        </button>
+                      </div>
+                    </div>
+
+                    <CourseAttendanceReport />
+                    <LectureCalendar />
+                  </div>
+                )}
+
+                {/* TAB: OWNER COURSEWORK (ASSIGN QUIZ / ASSIGNMENT & GRADE) */}
+                {activeTab === 'coursework' && (
+                  <div className="animate-fade-in">
+                    <AssessmentManager onCreated={() => fetchUsers()} />
+                    <TeacherGradingMatrix />
+                  </div>
+                )}
+
+                {/* TAB: OWNER SEMESTER REPORTS (PAGE A & PAGE B) */}
+                {activeTab === 'reports' && (
+                  <div className="animate-fade-in">
+                    <DatewiseAttendanceRegister />
+                    <div style={{ height: '30px' }} />
+                    <SubmissionStatusMatrix />
+                  </div>
+                )}
+
+                {/* TAB: OWNER DISPUTE QUEUE */}
+                {activeTab === 'disputes' && (
+                  <div className="animate-fade-in">
+                    <TeacherDisputeQueue />
+                  </div>
+                )}
+
+                {/* TAB: ADMIN TIMETABLE MANAGER */}
                 {activeTab === 'admin_timetable' && (
                   <div className="animate-fade-in">
                     <AdminTimetableManager />
                   </div>
                 )}
 
-                {/* TAB 3: ADMIN COURSE MANAGER */}
+                {/* TAB: ADMIN COURSE MANAGER */}
                 {activeTab === 'admin_courses' && (
                   <div className="animate-fade-in">
                     <AdminCourseManager />
                   </div>
                 )}
 
-                {/* TAB 4: ADMIN STUDENT ROSTER */}
+                {/* TAB: ADMIN STUDENT ROSTER */}
                 {activeTab === 'admin_students' && (
                   <div className="animate-fade-in">
                     <AdminStudentManager />
                   </div>
                 )}
 
-                {/* TAB 5: ADMIN FACULTY DIRECTORY */}
+                {/* TAB: ADMIN FACULTY DIRECTORY */}
                 {activeTab === 'admin_teachers' && (
                   <div className="animate-fade-in">
                     <AdminTeacherManager />
                   </div>
                 )}
 
-                {/* TAB 6: ADMIN RESULTS IMPORT */}
+                {/* TAB: ADMIN RESULTS IMPORT */}
                 {activeTab === 'results_import' && (
                   <div className="animate-fade-in">
                     <ResultsImportManager />
+                  </div>
+                )}
+
+                {/* TAB: ANNOUNCEMENTS */}
+                {activeTab === 'announcements' && (
+                  <div className="animate-fade-in">
+                    <AnnouncementsBoard />
                   </div>
                 )}
               </>

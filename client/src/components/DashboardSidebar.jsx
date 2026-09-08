@@ -64,11 +64,16 @@ export const DashboardSidebar = ({
     // Owner / Administrator
     return [
       { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
+      { id: 'attendance', label: 'Mark Attendance', icon: <CheckSquare size={18} />, badge: 'Fast' },
+      { id: 'coursework', label: 'Assignments & Quizzes', icon: <FileCheck size={18} /> },
+      { id: 'reports', label: 'Semester Reports (HOD)', icon: <FileSpreadsheet size={18} /> },
+      { id: 'disputes', label: 'Disputes Queue', icon: <AlertCircle size={18} /> },
       { id: 'admin_timetable', label: 'Timetable Manager', icon: <CalendarDays size={18} />, badge: '7th Sem' },
       { id: 'admin_courses', label: 'Course Manager', icon: <BookOpen size={18} /> },
       { id: 'admin_students', label: 'Student Roster', icon: <GraduationCap size={18} /> },
       { id: 'admin_teachers', label: 'Faculty Directory', icon: <Users size={18} /> },
       { id: 'results_import', label: 'Results Import', icon: <UploadCloud size={18} /> },
+      { id: 'announcements', label: 'Announcements', icon: <Bell size={18} /> },
     ];
   };
 

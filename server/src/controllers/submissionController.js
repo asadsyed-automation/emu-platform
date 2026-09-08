@@ -21,9 +21,14 @@ export const submitDriveUrl = async (req, res) => {
     }
 
     const submittedAt = new Date();
-    // Compute status (on-time vs late)
-    const isLate = submittedAt > new Date(assessment.deadline);
-    const status = isLate ? 'late' : 'on-time';
+    // System enforces submission deadline:
+    if (submittedAt > new Date(assessment.deadline)) {
+      return res.status(400).json({
+        message: 'Submission deadline has passed! Submissions are closed and marked as Missed.',
+      });
+    }
+
+    const status = 'on-time';
 
     let submission = await Submission.findOne({
       assignmentQuizId,
