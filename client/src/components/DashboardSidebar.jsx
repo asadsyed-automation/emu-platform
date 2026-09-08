@@ -22,6 +22,7 @@ import {
   GraduationCap,
   Shield,
   User as UserIcon,
+  KeyRound,
 } from 'lucide-react';
 
 export const DashboardSidebar = ({
@@ -31,6 +32,7 @@ export const DashboardSidebar = ({
   onToggleCollapse,
   mobileOpen,
   onCloseMobile,
+  onOpenChangePassword,
 }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -239,6 +241,66 @@ export const DashboardSidebar = ({
               );
             })}
           </nav>
+        </div>
+
+        {/* Bottom Sidebar Action Footer */}
+        <div
+          style={{
+            padding: collapsed ? '12px 6px' : '12px 14px',
+            borderTop: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+            backgroundColor: 'var(--bg-subtle)',
+          }}
+        >
+          <button
+            onClick={onOpenChangePassword}
+            title={collapsed ? 'Change Password' : undefined}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              gap: '10px',
+              padding: collapsed ? '9px 0' : '8px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-surface)',
+              color: 'var(--text-dark)',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              width: '100%',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <KeyRound size={15} style={{ color: 'var(--eum-gold)', flexShrink: 0 }} />
+            {!collapsed && <span>Change Password</span>}
+          </button>
+
+          <button
+            onClick={logout}
+            title={collapsed ? 'Sign Out' : undefined}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              gap: '10px',
+              padding: collapsed ? '9px 0' : '8px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid rgba(179, 55, 44, 0.2)',
+              backgroundColor: 'rgba(179, 55, 44, 0.05)',
+              color: 'var(--status-danger)',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              width: '100%',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <LogOut size={15} style={{ flexShrink: 0 }} />
+            {!collapsed && <span>Sign Out</span>}
+          </button>
         </div>
       </aside>
     </>

@@ -355,6 +355,43 @@ export const verifyOtp = async (req, res) => {
 };
 
 /**
+ * @desc Change password for logged in user (student/teacher/admin)
+ * @route POST /api/v1/auth/change-password
+ */
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!newPassword || newPassword.trim().length < 4) {
+      return res.status(400).json({ message: 'New password must be at least 4 characters long.' });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Check current password if provided
+    if (currentPassword) {
+      const isMatch = (await user.matchPassword(currentPassword)) || user.rollNumber.toUpperCase() === currentPassword.trim().toUpperCase();
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect.' });
+      }
+    }
+
+    user.passwordHash = await User.hashPassword(newPassword.trim());
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password changed successfully! You can now use your new password to sign in.',
+    });
+  } catch (error) {
+    console.error('Change Password Error:', error);
+    return res.status(500).json({ message: 'Server error updating password.', error: error.message });
+  }
+};
+
+/**
  * @desc Get current authenticated user details
  * @route GET /api/v1/auth/me
  */

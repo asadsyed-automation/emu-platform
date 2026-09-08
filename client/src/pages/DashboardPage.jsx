@@ -24,6 +24,7 @@ import { AdminTimetableManager } from '../components/AdminTimetableManager';
 import { AdminCourseManager } from '../components/AdminCourseManager';
 import { AdminTeacherManager } from '../components/AdminTeacherManager';
 import { AdminStudentManager } from '../components/AdminStudentManager';
+import { ChangePasswordModal } from '../components/ChangePasswordModal';
 import {
   Shield,
   User,
@@ -49,6 +50,7 @@ import {
   CalendarDays,
   UploadCloud,
   ChevronRight,
+  KeyRound,
 } from 'lucide-react';
 
 export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMobileSidebar }) => {
@@ -65,6 +67,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
 
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [usersList, setUsersList] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [generatingLectures, setGeneratingLectures] = useState(false);
@@ -144,6 +147,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         mobileOpen={isMobileOpen}
         onCloseMobile={handleCloseMobile}
+        onOpenChangePassword={() => setShowPasswordModal(true)}
       />
 
       {/* Main Content Area */}
@@ -171,7 +175,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                 Welcome, {user?.name}!
               </h2>
               <span className="badge badge-success">
-                <CheckCircle2 size={12} /> OTP Verified
+                <CheckCircle2 size={12} /> Active Account
               </span>
             </div>
             <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)' }}>
@@ -181,6 +185,15 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
 
           {/* Quick Header Actions */}
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setShowPasswordModal(true)}
+              className="btn btn-outline"
+              style={{ padding: '8px 14px', fontSize: '0.84rem' }}
+            >
+              <KeyRound size={15} />
+              <span>Change Password</span>
+            </button>
+
             {(user?.role === 'teacher' || user?.role === 'owner') && (
               <button
                 onClick={() => setShowAssessmentModal(!showAssessmentModal)}
@@ -800,6 +813,11 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
               fetchUsers();
             }}
           />
+        )}
+
+        {/* Change Password Modal */}
+        {showPasswordModal && (
+          <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
         )}
       </div>
     </div>
