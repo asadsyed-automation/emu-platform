@@ -88,7 +88,11 @@
   padding: 0;
 }
 
+html,
 body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
   font-family: var(--font-body);
   background-color: var(--bg-main);
   color: var(--text-dark);
@@ -504,6 +508,9 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   min-height: calc(100vh - 68px);
   background-color: var(--bg-main);
+  max-width: 100vw;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .dashboard-sidebar {
@@ -575,6 +582,8 @@ h1, h2, h3, h4, h5, h6 {
   flex: 1;
   min-width: 0;
   padding: 24px 28px 60px;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 @media (max-width: 960px) {
@@ -583,6 +592,7 @@ h1, h2, h3, h4, h5, h6 {
     top: 0;
     bottom: 0;
     left: 0;
+    width: min(300px, 85vw);
     height: 100vh;
     transform: translateX(-100%);
     box-shadow: var(--shadow-lg);
@@ -594,7 +604,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .dashboard-main {
-    padding: 16px 14px 40px;
+    padding: 14px 12px 40px;
   }
 
   .desktop-nav {

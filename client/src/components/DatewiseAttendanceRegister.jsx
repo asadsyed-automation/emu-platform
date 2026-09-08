@@ -171,8 +171,9 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
           </div>
 
           {/* Matrix Table */}
-          <div style={{ overflowX: 'auto' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <table style={{
+              minWidth: '700px',
               width: '100%',
               borderCollapse: 'collapse',
               fontSize: '0.78rem',

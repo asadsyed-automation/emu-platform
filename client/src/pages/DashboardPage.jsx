@@ -287,7 +287,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                     <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))',
                         gap: '16px',
                         marginBottom: '24px',
                       }}
@@ -477,7 +477,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                     <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
                         gap: '16px',
                         marginBottom: '24px',
                       }}
@@ -651,7 +651,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                     <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))',
                         gap: '16px',
                         marginBottom: '24px',
                       }}

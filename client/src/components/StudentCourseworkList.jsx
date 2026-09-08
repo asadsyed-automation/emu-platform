@@ -123,7 +123,7 @@ export const StudentCourseworkList = () => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
         {assessments.map((a) => {
           const sub = submissionsMap[a._id];
           const isPassed = new Date(a.deadline).getTime() < Date.now();

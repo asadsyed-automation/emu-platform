@@ -309,8 +309,8 @@ export const AdminStudentManager = ({ onOpenBulkImport }) => {
             Loading student accounts...
           </div>
         ) : (
-          <div style={{ overflowX: 'auto', maxHeight: '520px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxHeight: '520px' }}>
+            <table style={{ minWidth: '600px', width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
               <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-subtle)', zIndex: 1 }}>
                 <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color)' }}>
                   <th style={{ padding: '10px 14px' }}>Roll Number</th>

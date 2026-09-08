@@ -52,7 +52,7 @@ export const StudentAttendanceSummary = () => {
         My Course Attendance & Standing Overview
       </h3>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '16px' }}>
         {coursesSummary.map((item) => {
           const isExpanded = expandedCourse === item.courseId;
 

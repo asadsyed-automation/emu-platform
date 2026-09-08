@@ -175,8 +175,8 @@ export const EnrolledCoursesView = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '20px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+            gap: '16px',
           }}
         >
           {(courses.length > 0 ? courses : defaultCourses).map((c) => (

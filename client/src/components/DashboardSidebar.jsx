@@ -23,6 +23,7 @@ import {
   Shield,
   User as UserIcon,
   KeyRound,
+  X,
 } from 'lucide-react';
 
 export const DashboardSidebar = ({
@@ -159,9 +160,31 @@ export const DashboardSidebar = ({
             </div>
           )}
 
-          {/* Desktop Collapse Toggle */}
+          {/* Mobile Close Button (Visible on mobile drawers) */}
+          <button
+            onClick={onCloseMobile}
+            className="mobile-menu-btn"
+            aria-label="Close navigation drawer"
+            title="Close navigation drawer"
+            style={{
+              background: 'none',
+              border: '1px solid var(--border-color)',
+              borderRadius: '6px',
+              padding: '6px',
+              cursor: 'pointer',
+              color: 'var(--text-muted)',
+              display: 'none',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <X size={18} />
+          </button>
+
+          {/* Desktop Collapse Toggle (Visible on desktop) */}
           <button
             onClick={onToggleCollapse}
+            className="desktop-nav"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             style={{

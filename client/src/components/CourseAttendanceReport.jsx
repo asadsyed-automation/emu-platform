@@ -180,8 +180,8 @@ export const CourseAttendanceReport = ({ courseId, onMarkLecture }) => {
           No students found matching your query.
         </div>
       ) : (
-        <div style={{ overflowX: 'auto', maxHeight: '420px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxHeight: '420px' }}>
+          <table style={{ minWidth: '600px', width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
             <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-main)', zIndex: 1 }}>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color)' }}>
                 <th style={{ padding: '10px 12px' }}>Roll No</th>

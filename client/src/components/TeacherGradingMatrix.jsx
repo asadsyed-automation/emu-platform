@@ -309,8 +309,8 @@ export const TeacherGradingMatrix = () => {
           Loading coursework evaluation roster...
         </div>
       ) : (
-        <div style={{ overflowX: 'auto', maxHeight: '460px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.86rem' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxHeight: '460px' }}>
+          <table style={{ minWidth: '680px', width: '100%', borderCollapse: 'collapse', fontSize: '0.86rem' }}>
             <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-main)', zIndex: 1 }}>
               <tr style={{ textAlign: 'left', borderBottom: '2px solid var(--border-color)' }}>
                 <th style={{ padding: '10px 12px', width: '40px' }}>#</th>

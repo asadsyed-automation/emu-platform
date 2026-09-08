@@ -236,8 +236,8 @@ export const ResultsImportManager = () => {
           overflow: 'hidden',
         }}
       >
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table style={{ minWidth: '780px', width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
             <thead style={{ backgroundColor: 'var(--bg-subtle)' }}>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color)' }}>
                 <th style={{ padding: '12px 16px' }}>Roll Number</th>
