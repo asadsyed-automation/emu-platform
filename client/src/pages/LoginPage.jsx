@@ -52,7 +52,7 @@ export const LoginPage = ({ onBackToLanding }) => {
     const trimmedPass = password.trim();
 
     if (!trimmedId || !trimmedPass) {
-      setError('Please enter both your Roll Number / ID and Password.');
+      setError('Please enter both your Name and Password.');
       return;
     }
 
@@ -62,7 +62,7 @@ export const LoginPage = ({ onBackToLanding }) => {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          'Invalid credentials. Please verify your Roll Number / ID and Password.'
+          'Invalid credentials. Please verify your Name and Password.'
       );
     } finally {
       setLoading(false);
@@ -78,13 +78,13 @@ export const LoginPage = ({ onBackToLanding }) => {
     setActiveDemoRole(null);
   };
 
-  // Role Configurations - Clean & Minimal Placeholders
+  // Role Configurations - Clean & Name-Only First Field
   const roleConfig = {
     student: {
       title: 'Student Portal Sign In',
       badge: 'BS(CS) 7th Semester (Section 7A)',
-      idLabel: 'Roll Number or Full Name',
-      idPlaceholder: 'Enter your Roll Number (e.g. COSC2311XXXXX)',
+      idLabel: 'Full Name',
+      idPlaceholder: 'Enter your Full Name',
       passLabel: 'Password',
       passPlaceholder: 'Enter your password',
       note: '💡 Note: Initial default password is your Roll Number. You can change it inside your dashboard anytime.',
@@ -97,8 +97,8 @@ export const LoginPage = ({ onBackToLanding }) => {
     teacher: {
       title: 'Faculty Portal Sign In',
       badge: 'Course Instructor',
-      idLabel: 'Faculty Name or ID',
-      idPlaceholder: 'Enter Faculty Name or ID',
+      idLabel: 'Faculty Name',
+      idPlaceholder: 'Enter Faculty Name',
       passLabel: 'Faculty Password',
       passPlaceholder: 'Enter Faculty Password',
       note: '💡 Note: Enter faculty credentials to access fast attendance & lecture grading.',
@@ -111,8 +111,8 @@ export const LoginPage = ({ onBackToLanding }) => {
     owner: {
       title: 'Portal Lead & Admin Sign In',
       badge: 'System Administrator',
-      idLabel: 'Admin ID or Name',
-      idPlaceholder: 'Enter Admin ID or Name',
+      idLabel: 'Admin Name',
+      idPlaceholder: 'Enter Admin Name',
       passLabel: 'Admin Password',
       passPlaceholder: 'Enter Admin Password',
       note: '💡 Note: Authorized administrator credentials required for timetable & course controls.',
@@ -169,7 +169,7 @@ export const LoginPage = ({ onBackToLanding }) => {
                 Select Your Role to Sign In
               </h1>
               <p style={{ fontSize: '0.96rem', color: 'var(--text-muted)', maxWidth: '540px', margin: '0 auto' }}>
-                Direct, 1-step sign in. Enter your Roll Number or Name to access attendance, lectures, and academic schedules.
+                Direct, 1-step sign in. Enter your Name and Password to access attendance, lectures, and academic schedules.
               </p>
             </div>
 

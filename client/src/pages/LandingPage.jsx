@@ -184,7 +184,7 @@ export const LandingPage = ({ onGoToApp }) => {
                   </>
                 ) : (
                   <>
-                    Log In with Roll Number <ArrowRight size={16} />
+                    Sign In to Portal <ArrowRight size={16} />
                   </>
                 )}
               </button>
@@ -340,7 +340,7 @@ export const LandingPage = ({ onGoToApp }) => {
           {activeTab === 'students' ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
               {[
-                { step: '1', title: 'Login with Name & Roll Number', desc: 'Pre-created student account. Your Roll Number acts as your password; confirm OTP on your registered email.' },
+                { step: '1', title: 'Login with Name & Password', desc: 'Pre-created student account. Enter your full name and assigned password to access your dashboard.' },
                 { step: '2', title: 'Live 75% Target Badge', desc: 'Check your real-time attendance percentage in each of your 6 courses with standing alerts.' },
                 { step: '3', title: 'Google Drive Link Submissions', desc: 'Paste your coursework Drive link directly; EMU timestamps the exact second of submission as proof.' },
                 { step: '4', title: 'Peer-Verified Disputes', desc: 'Raise an absent dispute within 24h. Top 10 present peers vote to support before teacher approval.' },
