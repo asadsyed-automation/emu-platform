@@ -145,20 +145,20 @@ const seedSubmissionsAndDisputes = async () => {
     console.log('✅ Submissions seeded.');
 
     // 3. Seed Disputes
-    const calcCourse = courses.find((c) => c.code === 'MATH-3181');
-    const pdcCourse = courses.find((c) => c.code === 'COSE-3136');
+    const aoaCourse = courses.find((c) => c.code === 'COSC-4113');
+    const ccCourse = courses.find((c) => c.code === 'COSE-4135');
 
-    if (calcCourse) {
-      const calcLectures = await Lecture.find({ courseId: calcCourse._id }).sort({ date: 1 });
-      if (calcLectures.length > 2) {
+    if (aoaCourse) {
+      const aoaLectures = await Lecture.find({ courseId: aoaCourse._id }).sort({ date: 1 });
+      if (aoaLectures.length > 2) {
         for (const student of targetStudents) {
           await AttendanceDispute.findOneAndUpdate(
-            { lectureId: calcLectures[1]._id, studentId: student._id },
+            { lectureId: aoaLectures[1]._id, studentId: student._id },
             {
-              lectureId: calcLectures[1]._id,
-              courseId: calcCourse._id,
+              lectureId: aoaLectures[1]._id,
+              courseId: aoaCourse._id,
               studentId: student._id,
-              reason: 'I was present in room BOT-B1-F-102. Marked absent mistakenly due to seat change during attendance.',
+              reason: 'I was present in room CTB1-02. Marked absent mistakenly during attendance callout.',
               status: 'approved',
               peerVotes: [
                 { studentId: new mongoose.Types.ObjectId(), vote: 'agree', votedAt: new Date() },
@@ -166,7 +166,7 @@ const seedSubmissionsAndDisputes = async () => {
                 { studentId: new mongoose.Types.ObjectId(), vote: 'agree', votedAt: new Date() },
               ],
               teacherDecision: 'approved',
-              teacherComment: 'Confirmed by peers and seat record. Attendance updated to Present.',
+              teacherComment: 'Confirmed by peers and instructor. Attendance updated to Present.',
               decidedAt: new Date(),
             },
             { upsert: true }
@@ -175,17 +175,17 @@ const seedSubmissionsAndDisputes = async () => {
       }
     }
 
-    if (pdcCourse) {
-      const pdcLectures = await Lecture.find({ courseId: pdcCourse._id }).sort({ date: -1 });
-      if (pdcLectures.length > 0) {
+    if (ccCourse) {
+      const ccLectures = await Lecture.find({ courseId: ccCourse._id }).sort({ date: -1 });
+      if (ccLectures.length > 0) {
         for (const student of targetStudents) {
           await AttendanceDispute.findOneAndUpdate(
-            { lectureId: pdcLectures[0]._id, studentId: student._id },
+            { lectureId: ccLectures[0]._id, studentId: student._id },
             {
-              lectureId: pdcLectures[0]._id,
-              courseId: pdcCourse._id,
+              lectureId: ccLectures[0]._id,
+              courseId: ccCourse._id,
               studentId: student._id,
-              reason: 'Attended the lab session on Lab Block 2nd Floor. Name called while submitting workstation files.',
+              reason: 'Attended the Compiler Construction lab in CLab-06. Submitted scanner code on portal on time.',
               status: 'pending',
               peerVotes: [
                 { studentId: new mongoose.Types.ObjectId(), vote: 'agree', votedAt: new Date() },
@@ -208,3 +208,4 @@ const seedSubmissionsAndDisputes = async () => {
 };
 
 seedSubmissionsAndDisputes();
+

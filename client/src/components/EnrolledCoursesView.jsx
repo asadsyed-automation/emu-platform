@@ -16,73 +16,73 @@ export const EnrolledCoursesView = () => {
   const [loading, setLoading] = useState(true);
   const [viewTimetable, setViewTimetable] = useState(false);
 
-  // Official Emerson BS(CS) Course Definitions
+  // Official Emerson BS(CS) 7th Semester Course Definitions
   const defaultCourses = [
     {
       _id: 'c-1',
-      code: 'COSE-4149',
-      title: 'Cloud Computing',
-      creditHours: '3 (2+1)',
-      teacherName: 'Dr. Wasif Akbar',
-      teacherEmail: 'wasif.akbar@emerson.edu.pk',
-      room: 'BOT-B1-F-102 / LAB BLOCK',
-      schedule: 'Mon (14:20-15:10), Tue (14:20-15:10), Wed Lab (12:30-13:30)',
-      color: 'var(--eum-maroon)',
+      code: 'COSC-4113',
+      title: 'Analysis of Algorithms',
+      creditHours: '3 (3+0)',
+      teacherName: 'Mr. Qasim Niaz',
+      teacherEmail: 'qasim.niaz@emerson.edu.pk',
+      room: 'CTB1-02',
+      schedule: 'Tue (15:00-15:50), Wed (15:00-15:50), Thu (15:00-15:50)',
+      color: '#1B5E20',
     },
     {
       _id: 'c-2',
-      code: 'COSE-3133',
-      title: 'HCI & Computer Graphics',
+      code: 'COSE-4135',
+      title: 'Compiler Construction',
       creditHours: '3 (2+1)',
-      teacherName: 'Ms. Samia Nasir',
-      teacherEmail: 'samia.nasir@emerson.edu.pk',
-      room: 'BOT-B1-F-102 / LAB BLOCK',
-      schedule: 'Mon (15:10-16:00), Tue (15:10-16:00), Thu Lab (12:30-13:30)',
-      color: 'var(--eum-green)',
+      teacherName: 'Ms. Rozina Riaz',
+      teacherEmail: 'rozina.riaz@emerson.edu.pk',
+      room: 'CTB1-02 (Theory) / CLab-06 (Lab)',
+      schedule: 'Mon (13:30-14:20), Tue (13:30-14:20), Wed Lab (17:40-19:20)',
+      color: '#0D47A1',
     },
     {
       _id: 'c-3',
-      code: 'MATH-3181',
-      title: 'Multivariable Calculus',
-      creditHours: '3 (3+0)',
-      teacherName: 'Mr. Muhammad Farhan',
-      teacherEmail: 'muhammad.farhan@emerson.edu.pk',
-      room: 'BOT-B1-F-102',
-      schedule: 'Wed (14:45-16:00), Thu (13:30-14:45)',
-      color: '#9E7700',
+      code: 'COSE-4150',
+      title: 'Computer Graphics',
+      creditHours: '3 (2+1)',
+      teacherName: 'TO BE ASSIGNED (TBA)',
+      teacherEmail: 'tba.graphics@emerson.edu.pk',
+      room: 'CTB1-02 (Theory) / CLab-06 (Lab)',
+      schedule: 'Wed (14:20-15:10), Thu (14:20-15:10), Thu Lab (17:40-19:20)',
+      color: '#C2185B',
     },
     {
       _id: 'c-4',
-      code: 'COSE-3136',
-      title: 'Parallel & Distributed Computing',
-      creditHours: '3 (2+1)',
-      teacherName: 'Mr. Usman Mohyuddin',
-      teacherEmail: 'usman.mohyuddin@emerson.edu.pk',
-      room: 'BOT-B1-F-102 / LAB BLOCK',
-      schedule: 'Mon (13:30-14:20), Tue (13:30-14:20), Fri Lab (12:30-13:30)',
-      color: '#673AB7',
+      code: 'IT-404',
+      title: 'Cyber Security',
+      creditHours: '3 (3+0)',
+      teacherName: 'Ms. Samra Mushtaq',
+      teacherEmail: 'samra.mushtaq@emerson.edu.pk',
+      room: 'CTB1-02 / CLab-02',
+      schedule: 'Wed (13:30-14:20), Thu (13:30-14:20), Fri (16:50-18:30)',
+      color: '#D84315',
     },
     {
       _id: 'c-5',
-      code: 'BUAD-2123',
-      title: 'Principles of Marketing',
+      code: 'FLNG-xxxx',
+      title: 'Foreign Language',
       creditHours: '3 (3+0)',
-      teacherName: 'Mr. Ammar Haider',
-      teacherEmail: 'ammar.haider@emerson.edu.pk',
-      room: 'BOT-B1-F-102',
-      schedule: 'Thu (14:45-16:00), Fri (13:30-14:45)',
-      color: '#00838F',
+      teacherName: 'TO BE ASSIGNED (TBA)',
+      teacherEmail: 'tba.flng@emerson.edu.pk',
+      room: 'Online (MS Teams / Portal)',
+      schedule: 'Mon (15:50-16:40), Wed (15:50-16:40), Fri (15:00-15:50)',
+      color: '#6A1B9A',
     },
     {
       _id: 'c-6',
-      code: 'ENGL-3184',
-      title: 'Technical & Business Writing',
+      code: 'ARAB-3101',
+      title: 'Translation of the Holy Quran-V',
       creditHours: '3 (3+0)',
-      teacherName: 'Ms. Faeza Ayub',
-      teacherEmail: 'faezaayub134@gmail.com',
-      room: 'BOT-B1-F-102',
-      schedule: 'Wed (13:30-14:45), Fri (14:45-16:00)',
-      color: '#D84315',
+      teacherName: 'TO BE ASSIGNED (TBA)',
+      teacherEmail: 'tba.quran@emerson.edu.pk',
+      room: 'Online (MS Teams / Portal)',
+      schedule: 'Mon (15:00-15:50), Tue (15:50-16:40), Fri (15:50-16:40)',
+      color: '#00695C',
     },
   ];
 
@@ -90,7 +90,18 @@ export const EnrolledCoursesView = () => {
     try {
       const res = await API.get('/courses');
       if (res.data.courses && res.data.courses.length > 0) {
-        setCourses(res.data.courses);
+        const formatted = res.data.courses.map((c) => ({
+          _id: c._id,
+          code: c.code,
+          title: c.title,
+          creditHours: c.creditHours || '3 (3+0)',
+          teacherName: c.teacherId?.name || (c.code.includes('COSE-4150') || c.code.includes('FLNG') || c.code.includes('ARAB') ? 'TO BE ASSIGNED' : 'Faculty Member'),
+          teacherEmail: c.teacherId?.email || 'department@emerson.edu.pk',
+          room: c.defaultRoom || (c.isOnline ? 'Online' : 'CTB1-02'),
+          schedule: c.isOnline ? 'Online Slots Scheduled' : 'Weekly Timetable Slots Scheduled',
+          color: c.color || 'var(--eum-maroon)',
+        }));
+        setCourses(formatted);
       } else {
         setCourses(defaultCourses);
       }
@@ -168,7 +179,7 @@ export const EnrolledCoursesView = () => {
             gap: '20px',
           }}
         >
-          {defaultCourses.map((c) => (
+          {(courses.length > 0 ? courses : defaultCourses).map((c) => (
             <div
               key={c._id}
               className="card-hover animate-fade-in-up"

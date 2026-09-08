@@ -93,7 +93,7 @@ export const DisputeModal = ({ record, onClose, onSuccess }) => {
               rows={4}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Explain clearly why you were marked absent (e.g., Present in BOT-B1-F-102 room, medical slip submitted, late entry verified by peer)."
+              placeholder="Explain clearly why you were marked absent (e.g., Present in CTB1-02 room, medical slip submitted, late entry verified by peer)."
               required
             />
           </div>

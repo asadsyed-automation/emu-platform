@@ -26,9 +26,10 @@ const seedRichDemoData = async () => {
     const targetStudents = await User.find({
       $or: [
         { rollNumber: 'COSC231122114' },
-        { rollNumber: 'DEMO-STD-01' },
+        { rollNumber: 'DEMO-STU-01' },
       ],
     });
+
 
     const faculty = await User.findOne({ role: 'teacher' }) || await User.findOne({ role: 'owner' });
     const courses = await Course.find();
@@ -68,12 +69,12 @@ const seedRichDemoData = async () => {
 
     // 4. Create 15 lectures and realistic attendance for each course
     const attendancePatterns = {
-      'COSE-4149': [true, true, true, true, true, true, false, true, true, true, true, true, true, true, true], // 93.3%
-      'COSE-3133': [true, true, false, true, true, true, true, true, false, true, true, true, true, true, true], // 86.7%
-      'MATH-3181': [true, false, true, false, true, false, true, false, true, false, true, true, false, true, false], // 60.0% (At Risk!)
-      'COSE-3136': [true, true, true, false, true, true, true, false, true, true, true, false, true, true, true], // 80.0%
-      'BUAD-2123': [true, true, true, true, false, true, true, true, true, true, true, true, true, true, true], // 93.3%
-      'ENGL-3184': [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true], // 100%
+      'COSC-4113': [true, true, true, true, true, true, false, true, true, true, true, true, true, true, true], // 93.3%
+      'COSE-4135': [true, true, false, true, true, true, true, true, false, true, true, true, true, true, true], // 86.7%
+      'COSE-4150': [true, true, true, false, true, true, true, false, true, true, true, false, true, true, true], // 80.0%
+      'IT-404': [true, true, true, true, false, true, true, true, true, true, true, true, true, true, true], // 93.3%
+      'FLNG-xxxx': [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true], // 100%
+      'ARAB-3101': [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true], // 100%
     };
 
     for (const course of courses) {
@@ -95,7 +96,7 @@ const seedRichDemoData = async () => {
         if (!lecture) {
           lecture = await Lecture.create({
             courseId: course._id,
-            timetableSlotId: slot._id,
+            timetableSlotId: slot?._id,
             date: lectureDate,
             topic: `Lecture ${i + 1}: ${course.title} Module ${Math.floor(i / 3) + 1}`,
             status: 'attendance-closed',
@@ -175,12 +176,17 @@ const seedRichDemoData = async () => {
     }
     console.log('✅ Assessments ensured.');
 
+    // Clean old orphaned assessments if any
+    await AssignmentQuiz.deleteMany({ courseId: { $nin: courses.map((c) => c._id) } });
+
     // 6. Seed Submissions (On-Time, Late, Pending, Overdue)
     const allAssessments = await AssignmentQuiz.find().populate('courseId');
 
     for (const student of targetStudents) {
       for (const item of allAssessments) {
-        const courseCode = item.courseId?.code;
+        if (!item.courseId) continue;
+        const courseCode = item.courseId.code;
+
 
         if (item.sequenceIndex === 1 && item.type === 'assignment') {
           // On-Time Graded (10/10)
@@ -214,7 +220,7 @@ const seedRichDemoData = async () => {
             },
             { upsert: true }
           );
-        } else if (item.sequenceIndex === 2 && item.type === 'assignment' && courseCode === 'MATH-3181') {
+        } else if (item.sequenceIndex === 2 && item.type === 'assignment' && courseCode === 'COSC-4113') {
           // Late Submission (7/10)
           await Submission.findOneAndUpdate(
             { assignmentQuizId: item._id, studentId: student._id },
@@ -236,20 +242,20 @@ const seedRichDemoData = async () => {
     console.log('✅ Diverse coursework states seeded.');
 
     // 7. Seed Real-world Attendance Disputes
-    const calcCourse = courses.find((c) => c.code === 'MATH-3181');
-    const pdcCourse = courses.find((c) => c.code === 'COSE-3136');
+    const aoaCourse = courses.find((c) => c.code === 'COSC-4113');
+    const ccCourse = courses.find((c) => c.code === 'COSE-4135');
 
-    if (calcCourse) {
-      const calcLectures = await Lecture.find({ courseId: calcCourse._id }).sort({ date: 1 });
-      if (calcLectures.length > 2) {
+    if (aoaCourse) {
+      const aoaLectures = await Lecture.find({ courseId: aoaCourse._id }).sort({ date: 1 });
+      if (aoaLectures.length > 2) {
         for (const student of targetStudents) {
           await AttendanceDispute.findOneAndUpdate(
-            { lectureId: calcLectures[1]._id, studentId: student._id },
+            { lectureId: aoaLectures[1]._id, studentId: student._id },
             {
-              lectureId: calcLectures[1]._id,
-              courseId: calcCourse._id,
+              lectureId: aoaLectures[1]._id,
+              courseId: aoaCourse._id,
               studentId: student._id,
-              reason: 'I was present in room BOT-B1-F-102. Marked absent mistakenly due to seat change during attendance.',
+              reason: 'I was present in room CTB1-02. Marked absent mistakenly due to seat change during attendance.',
               status: 'approved',
               peerVotes: [
                 { studentId: new mongoose.Types.ObjectId(), vote: 'agree', votedAt: new Date() },
@@ -266,17 +272,17 @@ const seedRichDemoData = async () => {
       }
     }
 
-    if (pdcCourse) {
-      const pdcLectures = await Lecture.find({ courseId: pdcCourse._id }).sort({ date: -1 });
-      if (pdcLectures.length > 0) {
+    if (ccCourse) {
+      const ccLectures = await Lecture.find({ courseId: ccCourse._id }).sort({ date: -1 });
+      if (ccLectures.length > 0) {
         for (const student of targetStudents) {
           await AttendanceDispute.findOneAndUpdate(
-            { lectureId: pdcLectures[0]._id, studentId: student._id },
+            { lectureId: ccLectures[0]._id, studentId: student._id },
             {
-              lectureId: pdcLectures[0]._id,
-              courseId: pdcCourse._id,
+              lectureId: ccLectures[0]._id,
+              courseId: ccCourse._id,
               studentId: student._id,
-              reason: 'Attended the lab session on Lab Block 2nd Floor. Name called while submitting workstation files.',
+              reason: 'Attended the Compiler Construction lab in CLab-06. Name called while submitting workstation files.',
               status: 'pending',
               peerVotes: [
                 { studentId: new mongoose.Types.ObjectId(), vote: 'agree', votedAt: new Date() },
@@ -292,6 +298,7 @@ const seedRichDemoData = async () => {
 
     console.log('🎉 RICH DEMO DATA COMPLETE!');
     process.exit(0);
+
   } catch (err) {
     console.error('Seed error:', err);
     process.exit(1);

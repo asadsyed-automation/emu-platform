@@ -20,6 +20,10 @@ import { EnrolledCoursesView } from '../components/EnrolledCoursesView';
 import { StudentDisputesView } from '../components/StudentDisputesView';
 import { AcademicScheduleManager } from '../components/AcademicScheduleManager';
 import { ExamCountdownWidget } from '../components/ExamCountdownWidget';
+import { AdminTimetableManager } from '../components/AdminTimetableManager';
+import { AdminCourseManager } from '../components/AdminCourseManager';
+import { AdminTeacherManager } from '../components/AdminTeacherManager';
+import { AdminStudentManager } from '../components/AdminStudentManager';
 import {
   Shield,
   User,
@@ -119,8 +123,8 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
       status: 'scheduled',
       courseId: {
         _id: '6a8189584a3d82e0a1550bb5',
-        code: 'COSE-4149',
-        title: 'Cloud Computing',
+        code: 'COSC-4113',
+        title: 'Analysis of Algorithms',
       },
     });
     setActiveFastMarkLecture(targetLecture);
@@ -307,7 +311,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                           2 Pending
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                          Cloud Computing & HCI assignments
+                          Algorithms & Compiler Construction assignments
                         </div>
                       </div>
 
@@ -487,7 +491,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                           3 Lectures
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                          Room: BOT-B1-F-102 & LAB BLOCK
+                          Room: CTB1-02 & CLab-06 / CLab-02
                         </div>
                       </div>
 
@@ -668,10 +672,10 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                           Total Registered Accounts
                         </div>
                         <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--eum-maroon)', lineHeight: 1.1 }}>
-                          {usersList.length || 62} Users
+                          {usersList.length || 59} Users
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--eum-green)', marginTop: '4px', fontWeight: '600' }}>
-                          55 Students • 6 Faculty • 1 Lead
+                          55 Students • 3 Faculty • 1 Lead
                         </div>
                       </div>
 
@@ -708,7 +712,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                           Pending Disputes
                         </div>
                         <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#8C6800', lineHeight: 1.1 }}>
-                          2 Pending
+                          1 In Review
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--status-warning)', marginTop: '4px' }}>
                           Active across semester
@@ -728,7 +732,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                           Semester Lectures
                         </div>
                         <div style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text-dark)', lineHeight: 1.1 }}>
-                          240 Generated
+                          224 Generated
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '4px' }}>
                           16 Weeks (Aug 10 - Nov 27, 2026)
@@ -742,123 +746,46 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                   </div>
                 )}
 
-                {/* TAB 2: ADMIN ACCOUNTS */}
-                {activeTab === 'accounts' && (
+                {/* TAB 2: ADMIN TIMETABLE MANAGER */}
+                {activeTab === 'admin_timetable' && (
                   <div className="animate-fade-in">
-                    <div
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderRadius: 'var(--radius-lg)',
-                        padding: '24px 28px',
-                        border: '1px solid var(--border-color)',
-                        boxShadow: 'var(--shadow-sm)',
-                        marginBottom: '24px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        gap: '14px',
-                      }}
-                    >
-                      <div>
-                        <h2 style={{ fontSize: '1.35rem', color: 'var(--eum-maroon)', marginBottom: '2px' }}>
-                          Student & Faculty Account Management
-                        </h2>
-                        <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                          Manage pre-created section roster, OTP verification statuses, and credentials.
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => setShowBulkModal(true)}
-                        className="btn btn-primary"
-                        style={{ padding: '9px 18px', fontSize: '0.86rem' }}
-                      >
-                        <UserPlus size={16} /> Bulk Create Accounts
-                      </button>
-                    </div>
-
-                    {/* Users Roster Table */}
-                    <div
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '24px',
-                        border: '1px solid var(--border-color)',
-                        boxShadow: 'var(--shadow-sm)',
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                        <h3 style={{ fontSize: '1.1rem', color: 'var(--eum-maroon)' }}>
-                          Class Roll Directory ({usersList.length} Accounts)
-                        </h3>
-                        <button
-                          onClick={fetchUsers}
-                          className="btn btn-outline"
-                          style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-                        >
-                          <RefreshCw size={13} /> Refresh
-                        </button>
-                      </div>
-
-                      {loadingUsers ? (
-                        <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>Loading account roster...</p>
-                      ) : (
-                        <div style={{ overflowX: 'auto', maxHeight: '420px' }}>
-                          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
-                            <thead style={{ position: 'sticky', top: 0, backgroundColor: 'var(--bg-subtle)', zIndex: 1 }}>
-                              <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-color)' }}>
-                                <th style={{ padding: '10px 12px' }}>Roll / ID</th>
-                                <th style={{ padding: '10px 12px' }}>Name</th>
-                                <th style={{ padding: '10px 12px' }}>Email</th>
-                                <th style={{ padding: '10px 12px' }}>Role</th>
-                                <th style={{ padding: '10px 12px' }}>OTP Status</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {usersList.map((u) => (
-                                <tr key={u._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                  <td style={{ padding: '10px 12px', fontWeight: '600' }}>{u.rollNumber}</td>
-                                  <td style={{ padding: '10px 12px' }}>{u.name}</td>
-                                  <td style={{ padding: '10px 12px' }}>{u.email}</td>
-                                  <td style={{ padding: '10px 12px' }}>
-                                    <span className={`badge badge-${u.role}`}>{u.role}</span>
-                                  </td>
-                                  <td style={{ padding: '10px 12px' }}>
-                                    {u.otpVerified ? (
-                                      <span className="badge badge-success">Verified</span>
-                                    ) : (
-                                      <span className="badge badge-warning">Pending First Login</span>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                    </div>
+                    <AdminTimetableManager />
                   </div>
                 )}
 
-                {/* TAB 3: ADMIN COURSES & TIMETABLE */}
-                {activeTab === 'courses_timetable' && (
+                {/* TAB 3: ADMIN COURSE MANAGER */}
+                {activeTab === 'admin_courses' && (
                   <div className="animate-fade-in">
-                    <TimetableGrid />
-                    <LectureCalendar />
+                    <AdminCourseManager />
                   </div>
                 )}
 
-                {/* TAB 4: ADMIN VACATIONS & DATESHEETS */}
+                {/* TAB 4: ADMIN STUDENT ROSTER */}
+                {activeTab === 'admin_students' && (
+                  <div className="animate-fade-in">
+                    <AdminStudentManager />
+                  </div>
+                )}
+
+                {/* TAB 5: ADMIN FACULTY DIRECTORY */}
+                {activeTab === 'admin_teachers' && (
+                  <div className="animate-fade-in">
+                    <AdminTeacherManager />
+                  </div>
+                )}
+
+                {/* TAB 6: ADMIN VACATIONS & DATESHEETS */}
                 {activeTab === 'academic_schedule' && (
                   <div className="animate-fade-in">
                     <AcademicScheduleManager />
                   </div>
                 )}
 
-                {/* TAB 5: ADMIN RESULTS IMPORT */}
+                {/* TAB 7: ADMIN RESULTS IMPORT */}
                 {activeTab === 'results_import' && (
-                  <ResultsImportManager />
+                  <div className="animate-fade-in">
+                    <ResultsImportManager />
+                  </div>
                 )}
               </>
             )}

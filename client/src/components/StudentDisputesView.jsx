@@ -57,23 +57,23 @@ export const StudentDisputesView = () => {
   const displayDisputes = disputesList.length > 0 ? disputesList : [
     {
       id: 'disp-demo-1',
-      courseCode: 'COSE-4149',
-      courseTitle: 'Cloud Computing',
+      courseCode: 'COSC-4113',
+      courseTitle: 'Analysis of Algorithms',
       lectureDate: '2026-08-14',
       status: 'peer-voting',
-      reason: 'I was present in the second row during the Kubernetes demo. System marked absent.',
+      reason: 'I was present in the second row during the Dynamic Programming discussion in CTB1-02. System marked absent.',
       peerVotes: { yes: 2, no: 0, required: 3 },
       createdAt: '2026-08-14T15:30:00Z',
     },
     {
       id: 'disp-demo-2',
-      courseCode: 'COSE-3133',
-      courseTitle: 'HCI & Computer Graphics',
+      courseCode: 'COSE-4135',
+      courseTitle: 'Compiler Construction',
       lectureDate: '2026-08-12',
       status: 'approved',
-      reason: 'Joined class at 12:35 during lab setup. Teacher reviewed attendance log.',
+      reason: 'Joined class at 01:35 in CTB1-02 during syntax analysis lecture. Teacher reviewed attendance log.',
       peerVotes: { yes: 3, no: 0, required: 3 },
-      teacherDecision: 'Approved by Ms. Samia Nasir — Attendance record updated to Present.',
+      teacherDecision: 'Approved by Ms. Rozina Riaz — Attendance record updated to Present.',
       createdAt: '2026-08-12T13:00:00Z',
     },
   ];
@@ -131,8 +131,8 @@ export const StudentDisputesView = () => {
               setSelectedLectureForDispute({
                 _id: 'demo-lecture-id',
                 date: new Date().toISOString(),
-                courseCode: 'COSE-4149',
-                courseTitle: 'Cloud Computing',
+                courseCode: 'COSC-4113',
+                courseTitle: 'Analysis of Algorithms',
               });
               setShowRaiseModal(true);
             }

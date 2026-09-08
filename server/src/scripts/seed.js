@@ -67,12 +67,12 @@ const realStudentsData = [
 ];
 
 const teachersData = [
-  { name: 'Dr. Wasif Akbar', email: 'wasif.akbar@emerson.edu.pk', rollNumber: 'TCH-CC01' },
-  { name: 'Ms. Samia Nasir', email: 'samia.nasir@emerson.edu.pk', rollNumber: 'TCH-HCI01' },
-  { name: 'Mr. Muhammad Farhan', email: 'muhammad.farhan@emerson.edu.pk', rollNumber: 'TCH-MATH01' },
-  { name: 'Mr. Usman Mohyuddin', email: 'usman.mohyuddin@emerson.edu.pk', rollNumber: 'TCH-PDC01' },
-  { name: 'Mr. Ammar Haider', email: 'ammar.haider@emerson.edu.pk', rollNumber: 'TCH-MKT01' },
-  { name: 'Ms. Faeza Ayub', email: 'faezaayub134@gmail.com', rollNumber: 'TCH-ENG01' },
+  { name: 'Qasim Niaz', email: 'qasim.niaz@emerson.edu.pk', rollNumber: 'TCH-AOA01' },
+  { name: 'Rozina Riaz', email: 'rozina.riaz@emerson.edu.pk', rollNumber: 'TCH-CC01' },
+  { name: 'Samra Mushtaq', email: 'samra.mushtaq@emerson.edu.pk', rollNumber: 'TCH-CS01' },
+  { name: 'TO BE ASSIGNED (Computer Graphics)', email: 'cg.faculty@emerson.edu.pk', rollNumber: 'TCH-CG01' },
+  { name: 'TO BE ASSIGNED (Foreign Language)', email: 'flng.faculty@emerson.edu.pk', rollNumber: 'TCH-FLNG01' },
+  { name: 'TO BE ASSIGNED (Holy Quran-V)', email: 'arab.faculty@emerson.edu.pk', rollNumber: 'TCH-ARAB01' },
 ];
 
 const seedData = async () => {
@@ -111,7 +111,7 @@ const seedData = async () => {
     });
     console.log(`👑 Demo Admin Created: DEMO-ADM-01 (${demoAdmin.name})`);
 
-    // 2. Create Teachers Map - Password is teacher's rollNumber (e.g. TCH-CC01)
+    // 2. Create Teachers Map
     const teacherDocMap = {};
     for (const t of teachersData) {
       const teacherPasswordHash = await User.hashPassword(t.rollNumber);
@@ -138,14 +138,68 @@ const seedData = async () => {
     teacherDocMap['Prof. Tariq Demo (Faculty)'] = demoTeacher._id;
     console.log(`👨‍🏫 Demo Teacher Created: DEMO-TCH-01 (${demoTeacher.name})`);
 
-    // 3. Create Courses
+    // 3. Create 6 Official 7th Semester Courses
     const coursesDefinition = [
-      { key: 'CC', title: 'Cloud Computing', code: 'COSE-4149', teacherName: 'Dr. Wasif Akbar' },
-      { key: 'HCI', title: 'HCI & Computer Graphics', code: 'COSE-3133', teacherName: 'Ms. Samia Nasir' },
-      { key: 'MATH', title: 'Multivariable Calculus', code: 'MATH-3181', teacherName: 'Mr. Muhammad Farhan' },
-      { key: 'PDC', title: 'Parallel & Distributed Computing', code: 'COSE-3136', teacherName: 'Mr. Usman Mohyuddin' },
-      { key: 'MKT', title: 'Principles of Marketing', code: 'BUAD-2123', teacherName: 'Mr. Ammar Haider' },
-      { key: 'ENG', title: 'Technical & Business Writing', code: 'ENGL-3184', teacherName: 'Ms. Faeza Ayub' },
+      {
+        key: 'AOA',
+        title: 'Analysis of Algorithms',
+        code: 'COSC-4113',
+        teacherName: 'Qasim Niaz',
+        creditHours: '3+0',
+        defaultRoom: 'CTB1-02',
+        isOnline: false,
+        color: '#1E88E5',
+      },
+      {
+        key: 'CC',
+        title: 'Compiler Construction',
+        code: 'COSE-4135',
+        teacherName: 'Rozina Riaz',
+        creditHours: '2+1',
+        defaultRoom: 'CTB1-02 / CLab-06',
+        isOnline: false,
+        color: '#E65100',
+      },
+      {
+        key: 'CG',
+        title: 'Computer Graphics',
+        code: 'COSE-4150',
+        teacherName: 'TO BE ASSIGNED (Computer Graphics)',
+        creditHours: '2+1',
+        defaultRoom: 'CTB1-02 / CLab-06',
+        isOnline: false,
+        color: '#E91E63',
+      },
+      {
+        key: 'CS',
+        title: 'Cyber Security',
+        code: 'IT-404',
+        teacherName: 'Samra Mushtaq',
+        creditHours: '3+0',
+        defaultRoom: 'CTB1-02 / CLab-02',
+        isOnline: false,
+        color: '#00897B',
+      },
+      {
+        key: 'FLNG',
+        title: 'Foreign Language',
+        code: 'FLNG-xxxx',
+        teacherName: 'TO BE ASSIGNED (Foreign Language)',
+        creditHours: '3+0',
+        defaultRoom: 'Online',
+        isOnline: true,
+        color: '#8E24AA',
+      },
+      {
+        key: 'QURAN',
+        title: 'Translation of the Holy Quran-V',
+        code: 'ARAB-3101',
+        teacherName: 'TO BE ASSIGNED (Holy Quran-V)',
+        creditHours: '3+0',
+        defaultRoom: 'Online',
+        isOnline: true,
+        color: '#5E35B1',
+      },
     ];
 
     const courseDocMap = {};
@@ -154,10 +208,15 @@ const seedData = async () => {
         title: c.title,
         code: c.code,
         teacherId: teacherDocMap[c.teacherName],
-        semesterLabel: 'Fall 2026',
+        creditHours: c.creditHours,
+        semesterLabel: '7th Semester (Fall 2026)',
+        section: '7A',
+        defaultRoom: c.defaultRoom,
+        isOnline: c.isOnline,
+        color: c.color,
       });
       courseDocMap[c.key] = course._id;
-      console.log(`📚 Course Created: ${course.code} — ${course.title}`);
+      console.log(`📚 Course Created: ${course.code} — ${course.title} (Cr: ${course.creditHours})`);
     }
 
     // 4. Create Students and Enroll in All Courses
@@ -185,7 +244,7 @@ const seedData = async () => {
 
     const insertedStudents = await User.insertMany(studentUserDocs);
 
-    // Build all student enrollment documents
+    // Build student enrollment documents across all 6 courses
     const enrollmentDocs = [];
     for (const student of insertedStudents) {
       for (const courseId of Object.values(courseDocMap)) {
@@ -195,43 +254,178 @@ const seedData = async () => {
     await Enrollment.insertMany(enrollmentDocs);
     console.log(`🎓 Created & Enrolled ${insertedStudents.length} Students (including Demo Student) in all 6 courses.`);
 
-    // 5. Seed 15 Timetable Slots matching Official EUM Grid
+    // 5. Seed Official 7th Semester Timetable Slots
     const slotsDefinition = [
       // Monday
-      { courseKey: 'PDC', dayOfWeek: 'Monday', startTime: '13:30', endTime: '14:20', room: 'BOT-B1-F-102', isLab: false },
-      { courseKey: 'CC', dayOfWeek: 'Monday', startTime: '14:20', endTime: '15:10', room: 'BOT-B1-F-102', isLab: false },
-      { courseKey: 'HCI', dayOfWeek: 'Monday', startTime: '15:10', endTime: '16:00', room: 'BOT-B1-F-102', isLab: false },
+      {
+        courseKey: 'CC',
+        dayOfWeek: 'Monday',
+        startTime: '03:10 PM',
+        endTime: '04:00 PM',
+        room: 'CLab-06',
+        isLab: true,
+        slotType: 'lab',
+      },
+      {
+        courseKey: 'AOA',
+        dayOfWeek: 'Monday',
+        startTime: '04:00 PM',
+        endTime: '04:50 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        slotType: 'theory',
+      },
+
       // Tuesday
-      { courseKey: 'PDC', dayOfWeek: 'Tuesday', startTime: '13:30', endTime: '14:20', room: 'BOT-B1-F-102', isLab: false },
-      { courseKey: 'CC', dayOfWeek: 'Tuesday', startTime: '14:20', endTime: '15:10', room: 'BOT-B1-F-102', isLab: false },
-      { courseKey: 'HCI', dayOfWeek: 'Tuesday', startTime: '15:10', endTime: '16:00', room: 'BOT-B1-F-102', isLab: false },
+      {
+        courseKey: 'CC',
+        dayOfWeek: 'Tuesday',
+        startTime: '04:00 PM',
+        endTime: '04:50 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        slotType: 'theory',
+      },
+      {
+        courseKey: 'AOA',
+        dayOfWeek: 'Tuesday',
+        startTime: '04:50 PM',
+        endTime: '05:40 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        slotType: 'theory',
+      },
+
       // Wednesday
-      { courseKey: 'CC', dayOfWeek: 'Wednesday', startTime: '12:30', endTime: '13:30', room: 'LAB BLOCK', isLab: true },
-      { courseKey: 'ENG', dayOfWeek: 'Wednesday', startTime: '13:30', endTime: '14:45', room: 'BOT-B1-F-102', isLab: false },
-      { courseKey: 'MATH', dayOfWeek: 'Wednesday', startTime: '14:45', endTime: '16:00', room: 'BOT-B1-F-102', isLab: false },
+      {
+        courseKey: 'CS',
+        dayOfWeek: 'Wednesday',
+        startTime: '01:30 PM',
+        endTime: '02:20 PM',
+        room: 'CLab-02',
+        isLab: true,
+        slotType: 'lab',
+      },
+      {
+        courseKey: 'CG',
+        dayOfWeek: 'Wednesday',
+        startTime: '04:00 PM',
+        endTime: '04:50 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        isTBA: true,
+        slotType: 'tba',
+      },
+      {
+        courseKey: 'CS',
+        dayOfWeek: 'Wednesday',
+        startTime: '04:50 PM',
+        endTime: '05:40 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        slotType: 'theory',
+      },
+
       // Thursday
-      { courseKey: 'HCI', dayOfWeek: 'Thursday', startTime: '12:30', endTime: '13:30', room: 'LAB BLOCK', isLab: true },
-      { courseKey: 'MATH', dayOfWeek: 'Thursday', startTime: '13:30', endTime: '14:45', room: 'BOT-B1-F-102', isLab: false },
-      { courseKey: 'MKT', dayOfWeek: 'Thursday', startTime: '14:45', endTime: '16:00', room: 'BOT-B1-F-102', isLab: false },
+      {
+        courseKey: 'CC',
+        dayOfWeek: 'Thursday',
+        startTime: '04:00 PM',
+        endTime: '04:50 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        slotType: 'theory',
+      },
+      {
+        courseKey: 'CS',
+        dayOfWeek: 'Thursday',
+        startTime: '04:50 PM',
+        endTime: '05:40 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        slotType: 'theory',
+      },
+
       // Friday
-      { courseKey: 'PDC', dayOfWeek: 'Friday', startTime: '12:30', endTime: '13:30', room: 'LAB BLOCK', isLab: true },
-      { courseKey: 'MKT', dayOfWeek: 'Friday', startTime: '13:30', endTime: '14:45', room: 'BOT-B1-F-102', isLab: false },
-      { courseKey: 'ENG', dayOfWeek: 'Friday', startTime: '14:45', endTime: '16:00', room: 'BOT-B1-F-102', isLab: false },
+      {
+        courseKey: null,
+        dayOfWeek: 'Friday',
+        startTime: '01:30 PM',
+        endTime: '02:20 PM',
+        room: '—',
+        isLab: false,
+        slotType: 'break',
+        customTitle: 'Jummah Break',
+      },
+      {
+        courseKey: 'CG',
+        dayOfWeek: 'Friday',
+        startTime: '02:20 PM',
+        endTime: '03:10 PM',
+        room: 'CLab-06',
+        isLab: true,
+        isTBA: true,
+        slotType: 'lab',
+      },
+      {
+        courseKey: 'CG',
+        dayOfWeek: 'Friday',
+        startTime: '04:00 PM',
+        endTime: '04:50 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        isTBA: true,
+        slotType: 'tba',
+      },
+      {
+        courseKey: 'CG',
+        dayOfWeek: 'Friday',
+        startTime: '04:50 PM',
+        endTime: '05:40 PM',
+        room: 'CTB1-02',
+        isLab: false,
+        isTBA: true,
+        slotType: 'theory',
+      },
+      {
+        courseKey: 'QURAN',
+        dayOfWeek: 'Friday',
+        startTime: '05:40 PM',
+        endTime: '06:30 PM',
+        room: 'Online',
+        isOnline: true,
+        isTBA: true,
+        slotType: 'online',
+      },
+      {
+        courseKey: 'FLNG',
+        dayOfWeek: 'Friday',
+        startTime: '06:30 PM',
+        endTime: '07:20 PM',
+        room: 'Online',
+        isOnline: true,
+        isTBA: true,
+        slotType: 'online',
+      },
     ];
 
     const slotObjects = slotsDefinition.map((slotDef) => ({
-      courseId: courseDocMap[slotDef.courseKey],
+      courseId: slotDef.courseKey ? courseDocMap[slotDef.courseKey] : null,
       dayOfWeek: slotDef.dayOfWeek,
       startTime: slotDef.startTime,
       endTime: slotDef.endTime,
       room: slotDef.room,
-      isLab: slotDef.isLab,
+      isLab: slotDef.isLab || false,
+      isOnline: slotDef.isOnline || false,
+      isTBA: slotDef.isTBA || false,
+      slotType: slotDef.slotType || 'theory',
+      customTitle: slotDef.customTitle || '',
     }));
 
     const slotDocs = await TimetableSlot.insertMany(slotObjects);
-    console.log(`📅 Created ${slotDocs.length} Recurring Timetable Slots matching official grid.`);
+    console.log(`📅 Created ${slotDocs.length} Official 7th Semester Timetable Slots.`);
 
-    // 6. Generate Dated Lecture Instances for the Semester (16 Weeks starting from Aug 2026)
+    // 6. Generate Dated Lecture Instances for the Semester (16 Weeks: Aug 10 - Nov 27, 2026)
     const startDate = new Date('2026-08-10');
     const endDate = new Date('2026-11-27');
     const dayNameMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -242,7 +436,7 @@ const seedData = async () => {
 
     while (curDate <= endDate) {
       const dayName = dayNameMap[curDate.getDay()];
-      const matchingSlots = slotDocs.filter((s) => s.dayOfWeek === dayName);
+      const matchingSlots = slotDocs.filter((s) => s.dayOfWeek === dayName && s.courseId);
 
       for (const slot of matchingSlots) {
         lectureDocs.push({
@@ -258,10 +452,12 @@ const seedData = async () => {
     await Lecture.insertMany(lectureDocs);
     console.log(`⏱️ Auto-Generated ${lectureDocs.length} Dated Lecture Instances across the 16-week semester!`);
 
-    console.log('\n✨ Database Seeding Complete!');
+    console.log('\n✨ Database Seeding Complete for BSCS 7th Semester (Section 7A)!');
     console.log('------------------------------------------------------------------------');
     console.log(`Owner Account:   Name: "Asad Syed (Shah G)" | Password: OWNER-01`);
-    console.log(`Teacher Login:   Name: "Dr. Wasif Akbar"    | Password: TCH-CC01`);
+    console.log(`Teacher Login:   Name: "Qasim Niaz"         | Password: TCH-AOA01`);
+    console.log(`Teacher Login:   Name: "Rozina Riaz"        | Password: TCH-CC01`);
+    console.log(`Teacher Login:   Name: "Samra Mushtaq"      | Password: TCH-CS01`);
     console.log(`Shah G Student:  Name: "Syed Asad Ali Raza Shah" | Password: COSC231122114 | Email: asadraza5670@gmail.com`);
     console.log(`Other Students:  Name on roll list          | Password: <their roll number>`);
     console.log('------------------------------------------------------------------------');
@@ -274,3 +470,4 @@ const seedData = async () => {
 };
 
 seedData();
+

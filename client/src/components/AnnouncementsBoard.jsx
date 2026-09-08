@@ -20,9 +20,9 @@ export const AnnouncementsBoard = () => {
   const [announcements, setAnnouncements] = useState([
     {
       id: 'ann-1',
-      title: 'Midterm Evaluation & Date-Wise Attendance Register Audit',
+      title: '7th Semester Timetable & 75% Attendance Policy Verification',
       content:
-        'All students must maintain at least 75% attendance across all 6 courses before the upcoming Midterm examinations. Students below 75% will be flagged for review.',
+        'All students in BS(CS) 7th Semester (Section 7A Evening) must maintain at least 75% attendance across all 6 courses. Evening shift timetable runs Mon-Fri (01:30 PM - 07:20 PM) in CTB1-02 and CLab-06.',
       author: 'Pilot Administrator',
       role: 'owner',
       courseCode: 'All Courses',
@@ -32,24 +32,24 @@ export const AnnouncementsBoard = () => {
     },
     {
       id: 'ann-2',
-      title: 'Cloud Computing Lab 03 Assignment Link Submission',
+      title: 'Analysis of Algorithms - Assignment 01 Dynamic Programming',
       content:
-        'Please submit your GitHub repository and Google Drive execution video link for Lab 03 (Kubernetes Cluster deployment) before Friday 11:59 PM.',
-      author: 'Dr. Wasif Akbar',
+        'Please submit your algorithm design documentation and Google Drive execution video link for Assignment 01 before Friday 11:59 PM.',
+      author: 'Mr. Qasim Niaz',
       role: 'teacher',
-      courseCode: 'COSE-4149',
+      courseCode: 'COSC-4113',
       date: '2026-08-15',
       pinned: false,
       tag: 'Assignment',
     },
     {
       id: 'ann-3',
-      title: 'HCI & Computer Graphics Usability Testing Report Guidelines',
+      title: 'Compiler Construction Lab 01 Lexical Analyzer Setup',
       content:
-        'Guidelines for the heuristics evaluation report have been updated. Teams of 2 must conduct evaluation tests on 3 distinct peer prototypes.',
-      author: 'Ms. Samia Nasir',
+        'Lab guidelines for Lexical Analyzer implementation in CLab-06 have been uploaded. Wednesday Evening Lab slot: 05:40 PM - 07:20 PM.',
+      author: 'Ms. Rozina Riaz',
       role: 'teacher',
-      courseCode: 'COSE-3133',
+      courseCode: 'COSE-4135',
       date: '2026-08-14',
       pinned: false,
       tag: 'Project',
@@ -293,12 +293,12 @@ export const AnnouncementsBoard = () => {
                   onChange={(e) => setCourseCode(e.target.value)}
                 >
                   <option value="All Courses">All Courses (Class-wide)</option>
-                  <option value="COSE-4149">COSE-4149 — Cloud Computing</option>
-                  <option value="COSE-3133">COSE-3133 — HCI & Computer Graphics</option>
-                  <option value="MATH-3181">MATH-3181 — Multivariable Calculus</option>
-                  <option value="COSE-3136">COSE-3136 — Parallel & Distributed Computing</option>
-                  <option value="BUAD-2123">BUAD-2123 — Principles of Marketing</option>
-                  <option value="ENGL-3184">ENGL-3184 — Technical Writing</option>
+                  <option value="COSC-4113">COSC-4113 — Analysis of Algorithms</option>
+                  <option value="COSE-4135">COSE-4135 — Compiler Construction</option>
+                  <option value="COSE-4150">COSE-4150 — Computer Graphics</option>
+                  <option value="IT-404">IT-404 — Cyber Security</option>
+                  <option value="FLNG-xxxx">FLNG-xxxx — Foreign Language</option>
+                  <option value="ARAB-3101">ARAB-3101 — Translation of the Holy Quran-V</option>
                 </select>
               </div>
 

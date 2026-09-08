@@ -64,9 +64,11 @@ export const DashboardSidebar = ({
     // Owner / Administrator
     return [
       { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={18} /> },
-      { id: 'accounts', label: 'Accounts', icon: <Users size={18} /> },
-      { id: 'courses_timetable', label: 'Courses & Timetable', icon: <CalendarDays size={18} /> },
-      { id: 'academic_schedule', label: 'Vacations & Datesheets', icon: <CalendarDays size={18} />, badge: 'New' },
+      { id: 'admin_timetable', label: 'Timetable Manager', icon: <CalendarDays size={18} />, badge: '7th Sem' },
+      { id: 'admin_courses', label: 'Course Manager', icon: <BookOpen size={18} /> },
+      { id: 'admin_students', label: 'Student Roster', icon: <GraduationCap size={18} /> },
+      { id: 'admin_teachers', label: 'Faculty Directory', icon: <Users size={18} /> },
+      { id: 'academic_schedule', label: 'Vacations & Datesheets', icon: <CalendarCheck size={18} /> },
       { id: 'results_import', label: 'Results Import', icon: <UploadCloud size={18} /> },
     ];
   };

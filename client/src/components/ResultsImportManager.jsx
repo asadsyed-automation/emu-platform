@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 export const ResultsImportManager = () => {
-  const [selectedCourse, setSelectedCourse] = useState('COSE-4149');
+  const [selectedCourse, setSelectedCourse] = useState('COSC-4113');
   const [examType, setExamType] = useState('Midterm Examination (Fall 2026)');
   const [isPublished, setIsPublished] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
@@ -42,7 +42,7 @@ export const ResultsImportManager = () => {
   const handleSimulateCSVUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setUploadMessage(`Imported "${file.name}" with 54 student marks records! Ready for review.`);
+    setUploadMessage(`Imported "${file.name}" with 55 student marks records! Ready for review.`);
     setIsPublished(false);
   };
 
@@ -171,12 +171,12 @@ export const ResultsImportManager = () => {
                 setIsPublished(false);
               }}
             >
-              <option value="COSE-4149">COSE-4149 — Cloud Computing</option>
-              <option value="COSE-3133">COSE-3133 — HCI & Computer Graphics</option>
-              <option value="MATH-3181">MATH-3181 — Multivariable Calculus</option>
-              <option value="COSE-3136">COSE-3136 — Parallel & Distributed Computing</option>
-              <option value="BUAD-2123">BUAD-2123 — Principles of Marketing</option>
-              <option value="ENGL-3184">ENGL-3184 — Technical & Business Writing</option>
+              <option value="COSC-4113">COSC-4113 — Analysis of Algorithms</option>
+              <option value="COSE-4135">COSE-4135 — Compiler Construction</option>
+              <option value="COSE-4150">COSE-4150 — Computer Graphics</option>
+              <option value="IT-404">IT-404 — Cyber Security</option>
+              <option value="FLNG-xxxx">FLNG-xxxx — Foreign Language</option>
+              <option value="ARAB-3101">ARAB-3101 — Translation of the Holy Quran-V</option>
             </select>
           </div>
 

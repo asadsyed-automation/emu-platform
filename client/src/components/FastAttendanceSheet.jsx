@@ -156,7 +156,7 @@ export const FastAttendanceSheet = ({ lecture, onBack, onSubmitted }) => {
               Fast Attendance Sheet — {lecture.courseId?.code || 'Course'}
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              {new Date(lecture.date).toDateString()} • Room: <strong>{lecture.timetableSlotId?.room || 'BOT-B1-F-102'}</strong>
+              {new Date(lecture.date).toDateString()} • Room: <strong>{lecture.timetableSlotId?.room || 'CTB1-02'}</strong>
             </p>
           </div>
         </div>

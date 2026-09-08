@@ -93,12 +93,12 @@ export const LandingPage = ({ onGoToApp }) => {
   };
 
   const realCourses = [
-    { code: 'COSE-4149', title: 'Cloud Computing', teacher: 'Dr. Wasif Akbar', room: 'BOT-B1-F-102' },
-    { code: 'COSE-3133', title: 'HCI & Computer Graphics', teacher: 'Ms. Samia Nasir', room: 'BOT-B1-F-102' },
-    { code: 'MATH-3181', title: 'Multivariable Calculus', teacher: 'Mr. Muhammad Farhan', room: 'BOT-B1-F-102' },
-    { code: 'COSE-3136', title: 'Parallel & Distributed Computing', teacher: 'Mr. Usman Mohyuddin', room: 'LAB BLOCK' },
-    { code: 'BUAD-2123', title: 'Principles of Marketing', teacher: 'Mr. Ammar Haider', room: 'BOT-B1-F-102' },
-    { code: 'ENGL-3184', title: 'Technical & Business Writing', teacher: 'Ms. Faeza Ayub', room: 'BOT-B1-F-102' },
+    { code: 'COSC-4113', title: 'Analysis of Algorithms', teacher: 'Mr. Qasim Niaz', room: 'CTB1-02' },
+    { code: 'COSE-4135', title: 'Compiler Construction', teacher: 'Ms. Rozina Riaz', room: 'CTB1-02 / CLab-06' },
+    { code: 'COSE-4150', title: 'Computer Graphics', teacher: 'TO BE ASSIGNED', room: 'CTB1-02 / CLab-06' },
+    { code: 'IT-404', title: 'Cyber Security', teacher: 'Ms. Samra Mushtaq', room: 'CTB1-02 / CLab-02' },
+    { code: 'FLNG-xxxx', title: 'Foreign Language', teacher: 'TO BE ASSIGNED', room: 'Online' },
+    { code: 'ARAB-3101', title: 'Translation of the Holy Quran-V', teacher: 'TO BE ASSIGNED', room: 'Online' },
   ];
 
   const sampleRegisterStudents = [
@@ -230,7 +230,7 @@ export const LandingPage = ({ onGoToApp }) => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
                 <div>
                   <div style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--eum-maroon)' }}>
-                    <AnimatedCounter target={54} />
+                    <AnimatedCounter target={55} />
                   </div>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Enrolled Students</div>
                 </div>
@@ -355,7 +355,7 @@ export const LandingPage = ({ onGoToApp }) => {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
               {[
-                { step: '1', title: 'Mark Class in < 45 Seconds', desc: 'All 54 students are default-present. Tap absentees quickly and submit without manual roll calls.' },
+                { step: '1', title: 'Mark Class in < 45 Seconds', desc: 'All 55 students are default-present. Tap absentees quickly and submit without manual roll calls.' },
                 { step: '2', title: 'Review Drive Submissions', desc: 'Launch student Google Drive links in 1 click and record grades directly into the portal matrix.' },
                 { step: '3', title: '1-Click Semester Registers', desc: 'Auto-generate Page A Date-Wise Register and Page B Submission Matrix ready for HOD PDF/CSV export.' },
                 { step: '4', title: 'Peer-Filtered Dispute Queue', desc: 'Review only disputes that received at least 2/3 peer approval with full audit history attached.' },
@@ -499,16 +499,16 @@ export const LandingPage = ({ onGoToApp }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
               <div>
                 <div style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--eum-maroon)' }}>
-                  {demoTab === 'register' ? 'Course: Cloud Computing (COSE-4149) • Dr. Wasif Akbar' : 'Coursework Matrix: Cloud Computing • 3 Assignments & 3 Quizzes'}
+                  {demoTab === 'register' ? 'Course: Analysis of Algorithms (COSC-4113) • Mr. Qasim Niaz' : 'Coursework Matrix: Analysis of Algorithms • 3 Assignments & 3 Quizzes'}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  Faculty of Computing & Emerging Technologies • BS(CS) 7th Semester
+                  Department of Computer Science • BS(CS) 7th Semester Evening Section A
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={onGoToApp} className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '0.78rem' }}>
-                  <Printer size={13} /> Print Full 54-Student Register
+                  <Printer size={13} /> Print Full 55-Student Register
                 </button>
                 <button onClick={onGoToApp} className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.78rem' }}>
                   <Download size={13} /> Export CSV

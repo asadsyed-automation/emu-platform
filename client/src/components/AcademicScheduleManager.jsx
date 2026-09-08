@@ -60,7 +60,7 @@ export const AcademicScheduleManager = () => {
         courseId: courses[0]._id,
         date: startDate || new Date().toISOString().split('T')[0],
         timeSlot: '02:00 PM - 04:30 PM',
-        room: 'BOT-B1-F-102',
+        room: 'CTB1-02',
       },
     ]);
   };

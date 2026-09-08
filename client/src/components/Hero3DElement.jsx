@@ -123,10 +123,10 @@ export const Hero3DElement = () => {
           </div>
 
           <div style={{ fontSize: '1.05rem', fontWeight: '700', marginBottom: '2px' }}>
-            Advanced Web Engineering
+            Analysis of Algorithms
           </div>
           <div style={{ fontSize: '0.74rem', opacity: 0.88 }}>
-            Instructor: Dr. Wasif Akbar • Room: BOT-B1-F-102
+            Instructor: Mr. Qasim Niaz • Room: CTB1-02
           </div>
 
           <div
@@ -169,7 +169,7 @@ export const Hero3DElement = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Users size={16} style={{ color: 'var(--eum-green)' }} />
             <span style={{ fontSize: '0.78rem', fontWeight: '600', color: 'var(--text-dark)' }}>
-              <AnimatedCounter target={54} suffix=" Pre-Created Student Accounts" />
+              <AnimatedCounter target={55} suffix=" Pre-Created Student Accounts" />
             </span>
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--eum-green)', fontWeight: '700', backgroundColor: 'var(--status-success-bg)', padding: '2px 7px', borderRadius: '8px' }}>
