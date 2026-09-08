@@ -80,22 +80,23 @@ export const TimetableGrid = ({ onOpenAdminManager }) => {
   };
 
   const getRoomLocationDesc = (roomCode) => {
-    if (!roomCode || roomCode === '—') return 'Break Session / Common';
-    if (roomCode.toLowerCase().includes('online')) return 'Google Meet / Online LMS Class';
+    if (!roomCode || typeof roomCode !== 'string' || roomCode === '—') return 'Break Session / Common';
+    const rc = roomCode.toLowerCase();
+    if (rc.includes('online')) return 'Google Meet / Online LMS Class';
     if (roomCode.startsWith('CTB1')) return 'Old Building, Upper Floor (CTB1-01 to CTB1-08)';
     if (roomCode.startsWith('CTB2')) return 'Old Building, Ground Floor (CTB2-09 to CTB2-15)';
     if (roomCode.startsWith('CTB3')) return 'Botany Block, Upper Floor (CTB3-16 to CTB3-23)';
-    if (roomCode.startsWith('CLab') || roomCode.toLowerCase().includes('lab')) return 'Lab Block (CLab-01 to CLab-06)';
+    if (roomCode.startsWith('CLab') || rc.includes('lab')) return 'Lab Block (CLab-01 to CLab-06)';
     return 'University Main Campus Block';
   };
 
   const renderSlotCell = (slot, day, period) => {
     if (!slot) return <div style={{ height: '84px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light)', opacity: 0.4 }}>—</div>;
 
-    const isBreak = slot.slotType === 'break' || slot.customTitle?.toLowerCase().includes('break');
+    const isBreak = slot.slotType === 'break' || (typeof slot.customTitle === 'string' && slot.customTitle.toLowerCase().includes('break'));
     const isLab = slot.isLab || slot.slotType === 'lab';
     const isOnline = slot.isOnline || slot.slotType === 'online';
-    const isTBA = slot.isTBA || slot.slotType === 'tba' || slot.courseId?.teacherId?.name?.includes('ASSIGNED');
+    const isTBA = slot.isTBA || slot.slotType === 'tba' || (slot.courseId?.teacherId?.name && slot.courseId.teacherId.name.includes('ASSIGNED'));
 
     let bgStyle = 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)';
     let textColor = '#FFFFFF';

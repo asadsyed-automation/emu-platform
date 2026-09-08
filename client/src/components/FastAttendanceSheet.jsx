@@ -114,8 +114,8 @@ export const FastAttendanceSheet = ({ lecture, onBack, onSubmitted }) => {
 
   const filteredStudents = students.filter(
     (s) =>
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.rollNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      (s.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.rollNumber || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const absentCount = Object.keys(absentMap).filter((id) => absentMap[id] === true).length;
@@ -272,7 +272,7 @@ export const FastAttendanceSheet = ({ lecture, onBack, onSubmitted }) => {
       {/* Fast Interactive Grid (54 Cards) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
         gap: '10px',
         maxHeight: '480px',
         overflowY: 'auto',

@@ -52,7 +52,12 @@ const userSchema = new mongoose.Schema(
 
 // Method to compare entered password with hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.passwordHash);
+  if (!enteredPassword || !this.passwordHash) return false;
+  try {
+    return await bcrypt.compare(enteredPassword, this.passwordHash);
+  } catch (e) {
+    return false;
+  }
 };
 
 // Static helper to hash passwords

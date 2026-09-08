@@ -48,8 +48,8 @@ export const ResultsImportManager = () => {
 
   const filteredResults = resultsData.filter(
     (r) =>
-      r.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      r.rollNumber.toLowerCase().includes(searchFilter.toLowerCase())
+      (r.name || '').toLowerCase().includes(searchFilter.toLowerCase()) ||
+      (r.rollNumber || '').toLowerCase().includes(searchFilter.toLowerCase())
   );
 
   return (

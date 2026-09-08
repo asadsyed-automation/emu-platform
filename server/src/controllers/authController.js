@@ -365,16 +365,34 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({ message: 'New password must be at least 4 characters long.' });
     }
 
-    const user = await User.findById(req.user._id);
+    const userId = req.user?._id || req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Authentication required. Please sign in again.' });
+    }
+
+    const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+      return res.status(404).json({ message: 'User account not found.' });
     }
 
     // Check current password if provided
-    if (currentPassword) {
-      const isMatch = (await user.matchPassword(currentPassword)) || user.rollNumber.toUpperCase() === currentPassword.trim().toUpperCase();
+    if (currentPassword && currentPassword.trim()) {
+      let isMatch = false;
+      if (user.passwordHash) {
+        try {
+          isMatch = await user.matchPassword(currentPassword.trim());
+        } catch (err) {
+          isMatch = false;
+        }
+      }
+      
+      // Default initial password match (Roll Number or Name comparison)
+      if (!isMatch && user.rollNumber) {
+        isMatch = (user.rollNumber || '').trim().toUpperCase() === currentPassword.trim().toUpperCase();
+      }
+
       if (!isMatch) {
-        return res.status(400).json({ message: 'Current password is incorrect.' });
+        return res.status(400).json({ message: 'Current password is incorrect. (Default initial password is your Roll Number).' });
       }
     }
 
@@ -387,7 +405,7 @@ export const changePassword = async (req, res) => {
     });
   } catch (error) {
     console.error('Change Password Error:', error);
-    return res.status(500).json({ message: 'Server error updating password.', error: error.message });
+    return res.status(500).json({ message: 'Server error updating password: ' + (error.message || 'Please try again.'), error: error.message });
   }
 };
 

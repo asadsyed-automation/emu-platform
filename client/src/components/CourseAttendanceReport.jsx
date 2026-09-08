@@ -77,8 +77,8 @@ export const CourseAttendanceReport = ({ courseId, onMarkLecture }) => {
   const roster = reportData?.roster || [];
   const filteredRoster = roster.filter(
     (s) =>
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.rollNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      (s.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (s.rollNumber || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const sortedRoster = [...filteredRoster].sort((a, b) => {

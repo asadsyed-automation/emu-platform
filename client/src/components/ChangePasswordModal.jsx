@@ -76,7 +76,9 @@ export const ChangePasswordModal = ({ onClose }) => {
           border: '1px solid var(--border-color)',
           width: '100%',
           maxWidth: '440px',
-          overflow: 'hidden',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          margin: 'auto 10px',
         }}
         onClick={(e) => e.stopPropagation()}
       >
