@@ -56,18 +56,31 @@ const AppContent = () => {
       <div className="no-print" style={{
         backgroundColor: 'var(--bg-main)',
         borderBottom: '1px solid var(--border-color)',
-        padding: '6px 20px',
+        padding: '6px 16px',
         fontSize: '0.78rem',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '6px',
       }}>
-        <span>EMU Portal Active Session</span>
+        <span className="hide-on-mobile" style={{ color: 'var(--text-muted)' }}>EMU Portal Active Session</span>
         <button
           onClick={() => setViewMode('landing')}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--eum-maroon)', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: 'var(--eum-maroon)',
+            fontWeight: '600',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            fontSize: '0.76rem',
+            marginLeft: 'auto',
+          }}
         >
-          <Globe size={14} /> Preview Marketing Landing Page
+          <Globe size={13} /> Preview Landing Page
         </button>
       </div>
 

@@ -71,47 +71,67 @@ export const Navbar = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: '68px',
-          padding: '0 20px',
+          minHeight: '62px',
+          height: 'auto',
+          padding: '0 16px',
+          gap: '10px',
         }}
       >
         {/* Left: Brand Identity (Clickable to Home) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, flexShrink: 1 }}>
           <div
             onClick={handleLogoClick}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '12px',
+              gap: '10px',
               cursor: 'pointer',
               userSelect: 'none',
+              minWidth: 0,
             }}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter') handleLogoClick(); }}
             title="Return to EMU Homepage"
           >
-            <EmuLogo size={38} />
-            <div>
+            <div style={{ flexShrink: 0 }}>
+              <EmuLogo size={36} />
+            </div>
+            <div style={{ minWidth: 0, overflow: 'hidden' }}>
               <div
                 style={{
-                  fontSize: '1.18rem',
+                  fontSize: '1.12rem',
                   fontWeight: '800',
                   color: 'var(--eum-maroon)',
                   lineHeight: 1.15,
                   letterSpacing: '-0.3px',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 EMU Platform
               </div>
               <div
+                className="desktop-nav"
                 style={{
                   fontSize: '0.72rem',
                   color: 'var(--text-muted)',
                   fontWeight: '500',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 BS(CS) • Emerson University Multan
+              </div>
+              <div
+                className="mobile-only"
+                style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--text-muted)',
+                  fontWeight: '600',
+                  whiteSpace: 'nowrap',
+                  display: 'none',
+                }}
+              >
+                BS(CS) 7A
               </div>
             </div>
           </div>
@@ -148,7 +168,7 @@ export const Navbar = ({
             onClick={toggleTheme}
             className="btn btn-outline"
             style={{
-              padding: '6px 10px',
+              padding: '6px 9px',
               fontSize: '0.82rem',
               borderRadius: 'var(--radius-sm)',
             }}
@@ -219,10 +239,10 @@ export const Navbar = ({
             </>
           )}
 
-          {/* Dashboard Actions: Profile & Logout */}
+          {/* Dashboard Actions: Profile, Logout & Mobile Menu */}
           {variant === 'dashboard' && user && (
             <>
-              <div className="user-profile-header" style={{ textAlign: 'right' }}>
+              <div className="user-profile-header desktop-nav" style={{ textAlign: 'right' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
                   <span style={{ fontWeight: '600', fontSize: '0.88rem', color: 'var(--text-dark)' }}>
                     {user.name}
@@ -231,25 +251,20 @@ export const Navbar = ({
                 </div>
               </div>
 
-              {/* Mobile Role Badge */}
-              <div className="mobile-only" style={{ display: 'none' }}>
-                {getRoleBadge(user.role)}
-              </div>
-
               <button
                 onClick={logout}
-                className="btn btn-outline"
+                className="btn btn-outline desktop-nav"
                 style={{
-                  padding: '6px 10px',
+                  padding: '6px 12px',
                   fontSize: '0.82rem',
                 }}
                 title="Logout"
               >
                 <LogOut size={15} />
-                <span className="logout-text">Logout</span>
+                <span>Logout</span>
               </button>
 
-              {/* Mobile Sidebar Hamburger on Top Right */}
+              {/* Mobile Sidebar Drawer Button */}
               {onToggleSidebar && (
                 <button
                   onClick={onToggleSidebar}
