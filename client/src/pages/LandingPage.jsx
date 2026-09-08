@@ -493,7 +493,8 @@ export const LandingPage = ({ onGoToApp }) => {
               padding: '24px',
               border: '1px solid var(--border-color)',
               boxShadow: 'var(--shadow-md)',
-              overflowX: 'auto',
+              position: 'relative',
+              overflow: 'hidden',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
@@ -516,110 +517,176 @@ export const LandingPage = ({ onGoToApp }) => {
               </div>
             </div>
 
-            {demoTab === 'register' ? (
-              <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', fontSize: '0.84rem' }}>
-                <thead>
-                  <tr style={{ backgroundColor: 'var(--eum-maroon)', color: '#FFFFFF', textAlign: 'left' }}>
-                    <th style={{ padding: '10px 12px' }}>SR #</th>
-                    <th style={{ padding: '10px 12px' }}>Roll Number</th>
-                    <th style={{ padding: '10px 12px' }}>Student Name</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aug 10</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aug 11</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aug 12</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aug 17</th>
-                    <th style={{ padding: '10px 8px', textAlign: 'center' }}>Aug 18</th>
-                    <th style={{ padding: '10px 12px', textAlign: 'center' }}>Attendance %</th>
-                    <th style={{ padding: '10px 12px', textAlign: 'center' }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sampleRegisterStudents.map((s) => (
-                    <tr key={s.roll} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                      <td style={{ padding: '10px 12px', fontWeight: '600' }}>{s.sr}</td>
-                      <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontWeight: '700' }}>{s.roll}</td>
-                      <td style={{ padding: '10px 12px' }}>{s.name}</td>
-                      {s.marks.map((m, idx) => (
-                        <td
-                          key={idx}
-                          style={{
-                            padding: '10px 8px',
-                            textAlign: 'center',
-                            fontWeight: '700',
-                            color: m === 'P' ? 'var(--eum-green)' : 'var(--status-danger)',
-                            backgroundColor: m === 'P' ? 'rgba(28, 92, 52, 0.05)' : 'rgba(179, 55, 44, 0.08)',
-                          }}
-                        >
-                          {m}
-                        </td>
-                      ))}
-                      <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: '800', color: s.pct >= 75 ? 'var(--eum-green)' : 'var(--status-danger)' }}>
-                        {s.pct}%
-                      </td>
-                      <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                        <span className={`badge ${s.pct >= 75 ? 'badge-success' : 'badge-danger'}`} style={{ fontSize: '0.7rem' }}>
-                          {s.pct >= 75 ? 'Good Standing' : 'At Risk'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', fontSize: '0.84rem' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: 'var(--eum-green-dark)', color: '#FFFFFF', textAlign: 'left' }}>
-                      <th style={{ padding: '10px 12px' }}>SR #</th>
-                      <th style={{ padding: '10px 12px' }}>Roll Number</th>
-                      <th style={{ padding: '10px 12px' }}>Student Name</th>
-                      <th style={{ padding: '10px 8px', textAlign: 'center' }}>Assignment 1</th>
-                      <th style={{ padding: '10px 8px', textAlign: 'center' }}>Assignment 2</th>
-                      <th style={{ padding: '10px 8px', textAlign: 'center' }}>Quiz 1</th>
-                      <th style={{ padding: '10px 8px', textAlign: 'center' }}>Quiz 2</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'center' }}>Total Score</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'center' }}>Google Drive</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sampleSubmissionStudents.map((s) => (
-                      <tr key={s.roll} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                        <td style={{ padding: '10px 12px', fontWeight: '600' }}>{s.sr}</td>
-                        <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontWeight: '700', color: 'var(--eum-maroon)' }}>{s.roll}</td>
-                        <td style={{ padding: '10px 12px', fontWeight: '600' }}>{s.name}</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                          <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.a1.score}</span>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.a1.status}</div>
-                        </td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                          <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.a2.score}</span>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.a2.status}</div>
-                        </td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                          <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.q1.score}</span>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.q1.status}</div>
-                        </td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                          <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.q2.score}</span>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.q2.status}</div>
-                        </td>
-                        <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: '800', color: 'var(--eum-maroon)' }}>
-                          {s.total}
-                        </td>
-                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                          <button
-                            onClick={onGoToApp}
-                            className="btn btn-outline"
-                            style={{ padding: '4px 8px', fontSize: '0.72rem', color: 'var(--eum-green)', borderColor: 'var(--eum-green)' }}
-                          >
-                            <ExternalLink size={11} /> Drive Folder
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {/* Blurred Table Container with Privacy Overlay */}
+            <div style={{ position: 'relative', overflowX: 'auto', borderRadius: 'var(--radius-md)' }}>
+              {/* Privacy Overlay Lock Card */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'rgba(255, 255, 255, 0.45)',
+                  backdropFilter: 'blur(2px)',
+                  zIndex: 10,
+                  padding: '20px',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: 'var(--bg-surface)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '22px 28px',
+                    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
+                    maxWidth: '460px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '10px',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(122, 31, 31, 0.08)',
+                      color: 'var(--eum-maroon)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Lock size={22} />
+                  </div>
+                  <h4 style={{ fontSize: '1.05rem', color: 'var(--eum-maroon)', margin: 0, fontWeight: '700' }}>
+                    Protected Semester Records
+                  </h4>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.45 }}>
+                    Live register preview is blurred to protect student privacy and live attendance records. Sign in with your university credentials to view your verified data.
+                  </p>
+                  <button
+                    onClick={onGoToApp}
+                    className="btn btn-primary"
+                    style={{ padding: '8px 18px', fontSize: '0.84rem', marginTop: '4px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    Sign In to Access Portal <ArrowRight size={14} />
+                  </button>
+                </div>
               </div>
-            )}
+
+              {/* Blurred Table Content */}
+              <div style={{ filter: 'blur(5px)', pointerEvents: 'none', userSelect: 'none' }}>
+                {demoTab === 'register' ? (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', fontSize: '0.84rem' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: 'var(--eum-maroon)', color: '#FFFFFF', textAlign: 'left' }}>
+                        <th style={{ padding: '10px 12px' }}>SR #</th>
+                        <th style={{ padding: '10px 12px' }}>Roll Number</th>
+                        <th style={{ padding: '10px 12px' }}>Student Name</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>Sep 07</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>Sep 08</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>Sep 09</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>Sep 10</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center' }}>Sep 11</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'center' }}>Attendance %</th>
+                        <th style={{ padding: '10px 12px', textAlign: 'center' }}>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sampleRegisterStudents.map((s) => (
+                        <tr key={s.roll} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                          <td style={{ padding: '10px 12px', fontWeight: '600' }}>{s.sr}</td>
+                          <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontWeight: '700' }}>{s.roll}</td>
+                          <td style={{ padding: '10px 12px' }}>{s.name}</td>
+                          {s.marks.map((m, idx) => (
+                            <td
+                              key={idx}
+                              style={{
+                                padding: '10px 8px',
+                                textAlign: 'center',
+                                fontWeight: '700',
+                                color: m === 'P' ? 'var(--eum-green)' : 'var(--status-danger)',
+                                backgroundColor: m === 'P' ? 'rgba(28, 92, 52, 0.05)' : 'rgba(179, 55, 44, 0.08)',
+                              }}
+                            >
+                              {m}
+                            </td>
+                          ))}
+                          <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: '800', color: s.pct >= 75 ? 'var(--eum-green)' : 'var(--status-danger)' }}>
+                            {s.pct}%
+                          </td>
+                          <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                            <span className={`badge ${s.pct >= 75 ? 'badge-success' : 'badge-danger'}`} style={{ fontSize: '0.7rem' }}>
+                              {s.pct >= 75 ? 'Good Standing' : 'At Risk'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', fontSize: '0.84rem' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: 'var(--eum-green-dark)', color: '#FFFFFF', textAlign: 'left' }}>
+                          <th style={{ padding: '10px 12px' }}>SR #</th>
+                          <th style={{ padding: '10px 12px' }}>Roll Number</th>
+                          <th style={{ padding: '10px 12px' }}>Student Name</th>
+                          <th style={{ padding: '10px 8px', textAlign: 'center' }}>Assignment 1</th>
+                          <th style={{ padding: '10px 8px', textAlign: 'center' }}>Assignment 2</th>
+                          <th style={{ padding: '10px 8px', textAlign: 'center' }}>Quiz 1</th>
+                          <th style={{ padding: '10px 8px', textAlign: 'center' }}>Quiz 2</th>
+                          <th style={{ padding: '10px 12px', textAlign: 'center' }}>Total Score</th>
+                          <th style={{ padding: '10px 12px', textAlign: 'center' }}>Google Drive</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sampleSubmissionStudents.map((s) => (
+                          <tr key={s.roll} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                            <td style={{ padding: '10px 12px', fontWeight: '600' }}>{s.sr}</td>
+                            <td style={{ padding: '10px 12px', fontFamily: 'monospace', fontWeight: '700', color: 'var(--eum-maroon)' }}>{s.roll}</td>
+                            <td style={{ padding: '10px 12px', fontWeight: '600' }}>{s.name}</td>
+                            <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                              <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.a1.score}</span>
+                              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.a1.status}</div>
+                            </td>
+                            <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                              <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.a2.score}</span>
+                              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.a2.status}</div>
+                            </td>
+                            <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                              <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.q1.score}</span>
+                              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.q1.status}</div>
+                            </td>
+                            <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                              <span style={{ fontWeight: '700', color: 'var(--eum-green)' }}>{s.q2.score}</span>
+                              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{s.q2.status}</div>
+                            </td>
+                            <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: '800', color: 'var(--eum-maroon)' }}>
+                              {s.total}
+                            </td>
+                            <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                              <button
+                                onClick={onGoToApp}
+                                className="btn btn-outline"
+                                style={{ padding: '4px 8px', fontSize: '0.72rem', color: 'var(--eum-green)', borderColor: 'var(--eum-green)' }}
+                              >
+                                <ExternalLink size={11} /> Drive Folder
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>

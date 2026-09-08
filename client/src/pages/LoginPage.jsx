@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Navbar } from '../components/Navbar';
 import {
   Shield,
+  ShieldAlert,
   User,
   GraduationCap,
   AlertCircle,
@@ -15,6 +16,7 @@ import {
   EyeOff,
   Loader2,
   LogIn,
+  Mail,
 } from 'lucide-react';
 
 export const LoginPage = ({ onBackToLanding }) => {
@@ -50,7 +52,7 @@ export const LoginPage = ({ onBackToLanding }) => {
     const trimmedPass = password.trim();
 
     if (!trimmedId || !trimmedPass) {
-      setError('Please enter both your Roll Number / Name and Password.');
+      setError('Please enter both your Roll Number / ID and Password.');
       return;
     }
 
@@ -60,7 +62,7 @@ export const LoginPage = ({ onBackToLanding }) => {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          'Invalid credentials. Please verify your Roll Number / Name and Password.'
+          'Invalid credentials. Please verify your Roll Number / ID and Password.'
       );
     } finally {
       setLoading(false);
@@ -76,15 +78,15 @@ export const LoginPage = ({ onBackToLanding }) => {
     setActiveDemoRole(null);
   };
 
-  // Role Configurations
+  // Role Configurations - Clean & Minimal Placeholders
   const roleConfig = {
     student: {
       title: 'Student Portal Sign In',
       badge: 'BS(CS) 7th Semester (Section 7A)',
       idLabel: 'Roll Number or Full Name',
-      idPlaceholder: 'e.g. COSC231122114 or Syed Asad Ali Raza Shah',
+      idPlaceholder: 'Enter your Roll Number (e.g. COSC2311XXXXX)',
       passLabel: 'Password',
-      passPlaceholder: 'Your Roll Number (e.g. COSC231122114)',
+      passPlaceholder: 'Enter your password',
       note: '💡 Note: Initial default password is your Roll Number. You can change it inside your dashboard anytime.',
       demoName: 'Demo Student (Zaid Khan)',
       demoPass: 'DEMO-STU-01',
@@ -96,9 +98,9 @@ export const LoginPage = ({ onBackToLanding }) => {
       title: 'Faculty Portal Sign In',
       badge: 'Course Instructor',
       idLabel: 'Faculty Name or ID',
-      idPlaceholder: 'e.g. Qasim Niaz / Rozina Riaz / Samra Mushtaq',
+      idPlaceholder: 'Enter Faculty Name or ID',
       passLabel: 'Faculty Password',
-      passPlaceholder: 'e.g. TCH-AOA01',
+      passPlaceholder: 'Enter Faculty Password',
       note: '💡 Note: Enter faculty credentials to access fast attendance & lecture grading.',
       demoName: 'Prof. Tariq Demo (Faculty)',
       demoPass: 'DEMO-TCH-01',
@@ -110,10 +112,10 @@ export const LoginPage = ({ onBackToLanding }) => {
       title: 'Portal Lead & Admin Sign In',
       badge: 'System Administrator',
       idLabel: 'Admin ID or Name',
-      idPlaceholder: 'e.g. Asad Syed (Shah G) or OWNER-01',
+      idPlaceholder: 'Enter Admin ID or Name',
       passLabel: 'Admin Password',
-      passPlaceholder: 'e.g. OWNER-01',
-      note: '💡 Note: Authorized administrator credentials required for full timetable & course controls.',
+      passPlaceholder: 'Enter Admin Password',
+      note: '💡 Note: Authorized administrator credentials required for timetable & course controls.',
       demoName: 'Demo Admin (Portal Lead)',
       demoPass: 'DEMO-ADM-01',
       demoLabel: 'Demo Admin',
@@ -169,6 +171,35 @@ export const LoginPage = ({ onBackToLanding }) => {
               <p style={{ fontSize: '0.96rem', color: 'var(--text-muted)', maxWidth: '540px', margin: '0 auto' }}>
                 Direct, 1-step sign in. Enter your Roll Number or Name to access attendance, lectures, and academic schedules.
               </p>
+            </div>
+
+            {/* Strict Security Disclaimer Banner */}
+            <div
+              className="animate-fade-in-up"
+              style={{
+                backgroundColor: 'rgba(179, 55, 44, 0.07)',
+                border: '1px solid rgba(179, 55, 44, 0.22)',
+                borderRadius: 'var(--radius-md)',
+                padding: '14px 18px',
+                marginBottom: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: 'var(--status-danger)',
+                fontSize: '0.84rem',
+                lineHeight: 1.45,
+                boxShadow: '0 2px 8px rgba(179, 55, 44, 0.05)',
+              }}
+            >
+              <ShieldAlert size={22} style={{ flexShrink: 0, color: 'var(--status-danger)' }} />
+              <div>
+                <strong style={{ color: 'var(--eum-maroon)', display: 'block', marginBottom: '2px' }}>
+                  🔒 Strict Security Policy & Identity Disclaimer
+                </strong>
+                <span>
+                  Please sign in <strong>ONLY</strong> with your own assigned university credentials. Accessing or attempting to sign in using another student's or teacher's account is strictly prohibited and subject to institutional audit.
+                </span>
+              </div>
             </div>
 
             {/* 3 Role Cards Grid */}
@@ -443,6 +474,40 @@ export const LoginPage = ({ onBackToLanding }) => {
                 </div>
               </div>
             </div>
+
+            {/* Bottom Pilot Lead Contact Helper */}
+            <div
+              style={{
+                marginTop: '28px',
+                textAlign: 'center',
+                padding: '14px 20px',
+                backgroundColor: 'var(--bg-surface)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                fontSize: '0.84rem',
+                color: 'var(--text-muted)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <span>Need login assistance, credentials, or password reset?</span>
+              <a
+                href="mailto:asadraza5670@gmail.com?subject=EMU%20Platform%20Sign-In%20Support"
+                style={{
+                  color: 'var(--eum-maroon)',
+                  fontWeight: '700',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                }}
+              >
+                <Mail size={14} /> Contact Pilot Lead (asadraza5670@gmail.com)
+              </a>
+            </div>
           </div>
         ) : (
           /* VIEW 2: 1-STEP DIRECT LOGIN FORM */
@@ -510,6 +575,28 @@ export const LoginPage = ({ onBackToLanding }) => {
 
             {/* Card Body */}
             <div style={{ padding: '24px 28px' }}>
+              {/* Form Disclaimer */}
+              <div
+                style={{
+                  backgroundColor: 'rgba(179, 55, 44, 0.06)',
+                  border: '1px solid rgba(179, 55, 44, 0.2)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '9px 12px',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: 'var(--status-danger)',
+                  fontSize: '0.78rem',
+                  lineHeight: 1.35,
+                }}
+              >
+                <ShieldAlert size={16} style={{ flexShrink: 0 }} />
+                <span>
+                  <strong>Strict Notice:</strong> Sign in only with your own assigned credentials. Unauthorized access is strictly prohibited.
+                </span>
+              </div>
+
               {error && (
                 <div
                   style={{
@@ -630,8 +717,8 @@ export const LoginPage = ({ onBackToLanding }) => {
               {/* Quick Demo Login Option */}
               <div
                 style={{
-                  marginTop: '20px',
-                  paddingTop: '16px',
+                  marginTop: '18px',
+                  paddingTop: '14px',
                   borderTop: '1px solid var(--border-color)',
                   textAlign: 'center',
                 }}
@@ -669,8 +756,34 @@ export const LoginPage = ({ onBackToLanding }) => {
                 </button>
               </div>
 
-              {/* Back to Role Picker */}
-              <div style={{ textAlign: 'center', marginTop: '14px' }}>
+              {/* Support Email & Switch Role */}
+              <div
+                style={{
+                  marginTop: '16px',
+                  paddingTop: '12px',
+                  borderTop: '1px solid var(--border-color)',
+                  textAlign: 'center',
+                  fontSize: '0.78rem',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div>
+                  <span>Need login help? </span>
+                  <a
+                    href="mailto:asadraza5670@gmail.com?subject=EMU%20Platform%20Sign-In%20Support"
+                    style={{
+                      color: 'var(--eum-maroon)',
+                      fontWeight: '700',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    Email Pilot Lead
+                  </a>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => setSelectedRole(null)}
@@ -678,7 +791,7 @@ export const LoginPage = ({ onBackToLanding }) => {
                     background: 'none',
                     border: 'none',
                     color: 'var(--text-muted)',
-                    fontSize: '0.8rem',
+                    fontSize: '0.78rem',
                     cursor: 'pointer',
                     textDecoration: 'underline',
                   }}
@@ -693,3 +806,5 @@ export const LoginPage = ({ onBackToLanding }) => {
     </div>
   );
 };
+
+

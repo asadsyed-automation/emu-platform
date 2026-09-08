@@ -18,8 +18,6 @@ import { AnnouncementsBoard } from '../components/AnnouncementsBoard';
 import { ResultsImportManager } from '../components/ResultsImportManager';
 import { EnrolledCoursesView } from '../components/EnrolledCoursesView';
 import { StudentDisputesView } from '../components/StudentDisputesView';
-import { AcademicScheduleManager } from '../components/AcademicScheduleManager';
-import { ExamCountdownWidget } from '../components/ExamCountdownWidget';
 import { AdminTimetableManager } from '../components/AdminTimetableManager';
 import { AdminCourseManager } from '../components/AdminCourseManager';
 import { AdminTeacherManager } from '../components/AdminTeacherManager';
@@ -116,6 +114,15 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
   useEffect(() => {
     fetchUsers();
     fetchLecturesForMarking();
+
+    // Auto-popup change password dialog on successful login to secure account
+    if (user && user.role !== 'guest') {
+      const hasPrompted = sessionStorage.getItem(`pwd_prompted_${user.rollNumber || user._id || user.id}`);
+      if (!hasPrompted) {
+        setShowPasswordModal(true);
+        sessionStorage.setItem(`pwd_prompted_${user.rollNumber || user._id || user.id}`, 'true');
+      }
+    }
   }, [user]);
 
   // Demo Attendance trigger: opens the first available lecture in fast attendance sheet
@@ -276,9 +283,6 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                 {/* TAB 1: STUDENT OVERVIEW */}
                 {activeTab === 'overview' && (
                   <div className="animate-fade-in">
-                    {/* Real-Time Exam Countdown Banner */}
-                    <ExamCountdownWidget onOpenDatesheet={() => setActiveTab('datesheet')} />
-
                     {/* Quick Stats Grid */}
                     <div
                       style={{
@@ -395,19 +399,12 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                   </div>
                 )}
 
-                {/* TAB 5: DATESHEET & SCHEDULE */}
-                {activeTab === 'datesheet' && (
-                  <div className="animate-fade-in">
-                    <AcademicScheduleManager />
-                  </div>
-                )}
-
-                {/* TAB 6: COURSES */}
+                {/* TAB 5: COURSES & TIMETABLE */}
                 {activeTab === 'courses' && (
                   <EnrolledCoursesView />
                 )}
 
-                {/* TAB 7: ANNOUNCEMENTS */}
+                {/* TAB 6: ANNOUNCEMENTS */}
                 {activeTab === 'announcements' && (
                   <AnnouncementsBoard />
                 )}
@@ -422,9 +419,6 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                 {/* TAB 1: TEACHER OVERVIEW */}
                 {activeTab === 'overview' && (
                   <div className="animate-fade-in">
-                    {/* Real-Time Exam Countdown Banner */}
-                    <ExamCountdownWidget onOpenDatesheet={() => setActiveTab('schedule')} />
-
                     {/* Item 6: Demo Attendance Marking Card for Testing */}
                     <div
                       style={{
@@ -638,14 +632,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                   </div>
                 )}
 
-                {/* TAB 6: TEACHER ACADEMIC SCHEDULE */}
-                {activeTab === 'schedule' && (
-                  <div className="animate-fade-in">
-                    <AcademicScheduleManager />
-                  </div>
-                )}
-
-                {/* TAB 7: TEACHER ANNOUNCEMENTS */}
+                {/* TAB 6: TEACHER ANNOUNCEMENTS */}
                 {activeTab === 'announcements' && (
                   <AnnouncementsBoard />
                 )}
@@ -660,9 +647,6 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                 {/* TAB 1: ADMIN OVERVIEW */}
                 {activeTab === 'overview' && (
                   <div className="animate-fade-in">
-                    {/* Real-Time Exam Countdown Banner */}
-                    <ExamCountdownWidget onOpenDatesheet={() => setActiveTab('academic_schedule')} />
-
                     {/* System Stats Cards */}
                     <div
                       style={{
@@ -787,14 +771,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                   </div>
                 )}
 
-                {/* TAB 6: ADMIN VACATIONS & DATESHEETS */}
-                {activeTab === 'academic_schedule' && (
-                  <div className="animate-fade-in">
-                    <AcademicScheduleManager />
-                  </div>
-                )}
-
-                {/* TAB 7: ADMIN RESULTS IMPORT */}
+                {/* TAB 6: ADMIN RESULTS IMPORT */}
                 {activeTab === 'results_import' && (
                   <div className="animate-fade-in">
                     <ResultsImportManager />

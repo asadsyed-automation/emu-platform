@@ -45,8 +45,7 @@ export const DashboardSidebar = ({
         { id: 'attendance', label: 'My Attendance', icon: <CalendarCheck size={18} /> },
         { id: 'disputes', label: 'My Disputes', icon: <AlertCircle size={18} /> },
         { id: 'coursework', label: 'Assignments & Quizzes', icon: <FileCheck size={18} /> },
-        { id: 'datesheet', label: 'Datesheet & Schedule', icon: <CalendarDays size={18} /> },
-        { id: 'courses', label: 'Courses', icon: <BookOpen size={18} /> },
+        { id: 'courses', label: 'Courses & Timetable', icon: <BookOpen size={18} /> },
         { id: 'announcements', label: 'Announcements', icon: <Bell size={18} /> },
       ];
     }
@@ -57,8 +56,7 @@ export const DashboardSidebar = ({
         { id: 'attendance', label: 'Attendance', icon: <CheckSquare size={18} /> },
         { id: 'disputes', label: 'Disputes', icon: <AlertCircle size={18} /> },
         { id: 'coursework', label: 'Assignments & Quizzes', icon: <FileCheck size={18} /> },
-        { id: 'reports', label: 'Semester Reports', icon: <FileSpreadsheet size={18} /> },
-        { id: 'schedule', label: 'Academic Schedule', icon: <CalendarDays size={18} /> },
+        { id: 'reports', label: 'Semester Reports (HOD)', icon: <FileSpreadsheet size={18} /> },
         { id: 'announcements', label: 'Announcements', icon: <Bell size={18} /> },
       ];
     }
@@ -70,7 +68,6 @@ export const DashboardSidebar = ({
       { id: 'admin_courses', label: 'Course Manager', icon: <BookOpen size={18} /> },
       { id: 'admin_students', label: 'Student Roster', icon: <GraduationCap size={18} /> },
       { id: 'admin_teachers', label: 'Faculty Directory', icon: <Users size={18} /> },
-      { id: 'academic_schedule', label: 'Vacations & Datesheets', icon: <CalendarCheck size={18} /> },
       { id: 'results_import', label: 'Results Import', icon: <UploadCloud size={18} /> },
     ];
   };
