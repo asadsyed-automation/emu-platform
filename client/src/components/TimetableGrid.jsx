@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { EmuLogo } from './EmuLogo';
 import {
   Calendar,
@@ -18,15 +19,18 @@ import {
   X,
   ChevronRight,
   Info,
+  UserCheck,
 } from 'lucide-react';
 
 export const TimetableGrid = ({ onOpenAdminManager }) => {
+  const { user } = useAuth();
   const [timetable, setTimetable] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [viewMode, setViewMode] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 768 ? 'cards' : 'matrix'));
   const [selectedSlotModal, setSelectedSlotModal] = useState(null);
   const [activeDayFilter, setActiveDayFilter] = useState('All');
+  const [teacherScope, setTeacherScope] = useState(user?.role === 'teacher' ? 'my_courses' : 'all');
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -75,9 +79,19 @@ export const TimetableGrid = ({ onOpenAdminManager }) => {
   const currentDay = getTodayDayName();
   const effectiveToday = days.includes(currentDay) ? currentDay : 'Monday';
 
+  // Helper to filter slots based on teacher scope
+  const isSlotVisibleForUser = (slot) => {
+    if (!slot) return false;
+    if (user?.role !== 'teacher' || teacherScope === 'all' || user?.rollNumber === 'DEMO-TCH-01') return true;
+    const tId = slot.courseId?.teacherId?._id?.toString() || slot.courseId?.teacherId?.toString();
+    const tRoll = slot.courseId?.teacherId?.rollNumber;
+    return tId === user?._id?.toString() || tRoll === user?.rollNumber;
+  };
+
   const getSlotForCell = (day, period) => {
     const daySlots = timetable[day] || [];
     return daySlots.find((s) => {
+      if (!isSlotVisibleForUser(s)) return false;
       const sStart = (s.startTime || '').trim().toUpperCase();
       return sStart.includes(period.start) || sStart.includes(period.start.replace(' ', '')) || sStart.startsWith(period.start.slice(0, 5));
     });
@@ -289,39 +303,89 @@ export const TimetableGrid = ({ onOpenAdminManager }) => {
           </div>
         </div>
 
-        {/* View Mode Switcher */}
-        <div
-          style={{
-            display: 'flex',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            padding: '4px',
-            borderRadius: '24px',
-            gap: '4px',
-          }}
-        >
-          {[
-            { id: 'cards', label: 'Day Cards' },
-            { id: 'today', label: 'Today' },
-            { id: 'matrix', label: 'Full Week Grid' },
-          ].map((m) => (
-            <button
-              key={m.id}
-              onClick={() => setViewMode(m.id)}
+        {/* View Mode & Teacher Scope Switchers */}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {user?.role === 'teacher' && (
+            <div
               style={{
-                backgroundColor: viewMode === m.id ? '#0284C7' : 'transparent',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontSize: '0.78rem',
-                fontWeight: '700',
-                transition: 'all 0.18s ease',
+                display: 'flex',
+                backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                padding: '4px',
+                borderRadius: '24px',
+                gap: '4px',
               }}
             >
-              {m.label}
-            </button>
-          ))}
+              <button
+                onClick={() => setTeacherScope('my_courses')}
+                style={{
+                  backgroundColor: teacherScope === 'my_courses' ? 'var(--eum-maroon)' : 'transparent',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '5px 10px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '0.74rem',
+                  fontWeight: '700',
+                  transition: 'all 0.18s ease',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <UserCheck size={12} /> My Classes
+              </button>
+              <button
+                onClick={() => setTeacherScope('all')}
+                style={{
+                  backgroundColor: teacherScope === 'all' ? 'var(--eum-maroon)' : 'transparent',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '5px 10px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '0.74rem',
+                  fontWeight: '700',
+                  transition: 'all 0.18s ease',
+                }}
+              >
+                All Section 7A
+              </button>
+            </div>
+          )}
+
+          <div
+            style={{
+              display: 'flex',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              padding: '4px',
+              borderRadius: '24px',
+              gap: '4px',
+            }}
+          >
+            {[
+              { id: 'cards', label: 'Day Cards' },
+              { id: 'today', label: 'Today' },
+              { id: 'matrix', label: 'Full Week Grid' },
+            ].map((m) => (
+              <button
+                key={m.id}
+                onClick={() => setViewMode(m.id)}
+                style={{
+                  backgroundColor: viewMode === m.id ? '#0284C7' : 'transparent',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '0.78rem',
+                  fontWeight: '700',
+                  transition: 'all 0.18s ease',
+                }}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

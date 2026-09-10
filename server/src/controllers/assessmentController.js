@@ -45,13 +45,20 @@ export const createAssessment = async (req, res) => {
 };
 
 /**
- * @desc Get assessments for a course
+ * @desc Get assessments for a course with teacher scoping
  * @route GET /api/v1/assessments
  */
 export const getCourseAssessments = async (req, res) => {
   try {
     const { courseId } = req.query;
-    const filter = courseId ? { courseId } : {};
+    const filter = {};
+    if (courseId) {
+      filter.courseId = courseId;
+    } else if (req.user?.role === 'teacher' && req.user?.rollNumber !== 'DEMO-TCH-01') {
+      const teacherCourses = await Course.find({ teacherId: req.user._id });
+      const courseIds = teacherCourses.map((c) => c._id);
+      filter.courseId = { $in: courseIds };
+    }
 
     const assessments = await AssignmentQuiz.find(filter)
       .populate('courseId', 'title code')

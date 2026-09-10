@@ -13,6 +13,7 @@ import { AssessmentManager } from '../components/AssessmentManager';
 import { StudentCourseworkList } from '../components/StudentCourseworkList';
 import { TeacherGradingMatrix } from '../components/TeacherGradingMatrix';
 import { DatewiseAttendanceRegister } from '../components/DatewiseAttendanceRegister';
+import { CourseLectureScheduleTable } from '../components/CourseLectureScheduleTable';
 import { SubmissionStatusMatrix } from '../components/SubmissionStatusMatrix';
 import { AnnouncementsBoard } from '../components/AnnouncementsBoard';
 import { ResultsImportManager } from '../components/ResultsImportManager';
@@ -552,58 +553,8 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                 {/* TAB 2: TEACHER ATTENDANCE */}
                 {activeTab === 'attendance' && (
                   <div className="animate-fade-in">
-                    {/* Attendance selector / launcher */}
-                    <div
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '20px 24px',
-                        border: '1px solid var(--border-color)',
-                        marginBottom: '20px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        gap: '14px',
-                      }}
-                    >
-                      <div>
-                        <h3 style={{ fontSize: '1.15rem', color: 'var(--eum-maroon)', marginBottom: '3px' }}>
-                          Fast Lecture Attendance Sheet Launcher
-                        </h3>
-                        <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                          Select any lecture slot to open and mark class attendance:
-                        </p>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        <select
-                          className="form-input"
-                          style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto', maxWidth: '100%' }}
-                          onChange={(e) => {
-                            const selected = todaysLectures.find((l) => l._id === e.target.value);
-                            if (selected) setActiveFastMarkLecture(selected);
-                          }}
-                          defaultValue=""
-                        >
-                          <option value="" disabled>-- Select Lecture Slot --</option>
-                          {todaysLectures.slice(0, 15).map((l) => (
-                            <option key={l._id} value={l._id}>
-                              {new Date(l.date).toLocaleDateString()} — {l.courseId?.code || 'CS'} ({l.status})
-                            </option>
-                          ))}
-                        </select>
-
-                        <button
-                          onClick={() => handleLaunchDemoAttendance()}
-                          className="btn btn-primary"
-                          style={{ padding: '8px 16px', fontSize: '0.86rem' }}
-                        >
-                          <Zap size={14} /> Mark Fast Attendance
-                        </button>
-                      </div>
-                    </div>
-
+                    <CourseLectureScheduleTable onOpenFastMark={(lecture) => setActiveFastMarkLecture(lecture)} />
+                    <div style={{ height: '24px' }} />
                     <DatewiseAttendanceRegister onOpenFastMark={(lecture) => setActiveFastMarkLecture(lecture)} />
                     <div style={{ height: '24px' }} />
                     <CourseAttendanceReport />
@@ -748,57 +699,8 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                 {/* TAB: OWNER FAST ATTENDANCE MARKING */}
                 {activeTab === 'attendance' && (
                   <div className="animate-fade-in">
-                    <div
-                      style={{
-                        backgroundColor: 'var(--bg-surface)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '20px 24px',
-                        border: '1px solid var(--border-color)',
-                        marginBottom: '20px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        flexWrap: 'wrap',
-                        gap: '14px',
-                      }}
-                    >
-                      <div>
-                        <h3 style={{ fontSize: '1.15rem', color: 'var(--eum-maroon)', marginBottom: '3px' }}>
-                          Fast Lecture Attendance Sheet Launcher (Admin Access)
-                        </h3>
-                        <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)' }}>
-                          Select any scheduled course lecture slot to open & mark section attendance:
-                        </p>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        <select
-                          className="form-input"
-                          style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto', maxWidth: '100%' }}
-                          onChange={(e) => {
-                            const selected = todaysLectures.find((l) => l._id === e.target.value);
-                            if (selected) setActiveFastMarkLecture(selected);
-                          }}
-                          defaultValue=""
-                        >
-                          <option value="" disabled>-- Select Lecture Slot --</option>
-                          {todaysLectures.slice(0, 25).map((l) => (
-                            <option key={l._id} value={l._id}>
-                              {new Date(l.date).toLocaleDateString()} — {l.courseId?.code || 'CS'} ({l.status})
-                            </option>
-                          ))}
-                        </select>
-
-                        <button
-                          onClick={() => handleLaunchDemoAttendance()}
-                          className="btn btn-primary"
-                          style={{ padding: '8px 16px', fontSize: '0.86rem' }}
-                        >
-                          <Zap size={14} /> Mark Fast Attendance
-                        </button>
-                      </div>
-                    </div>
-
+                    <CourseLectureScheduleTable onOpenFastMark={(lecture) => setActiveFastMarkLecture(lecture)} />
+                    <div style={{ height: '24px' }} />
                     <DatewiseAttendanceRegister onOpenFastMark={(lecture) => setActiveFastMarkLecture(lecture)} />
                     <div style={{ height: '24px' }} />
                     <CourseAttendanceReport />
