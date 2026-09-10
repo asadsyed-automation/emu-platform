@@ -552,7 +552,7 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                 {/* TAB 2: TEACHER ATTENDANCE */}
                 {activeTab === 'attendance' && (
                   <div className="animate-fade-in">
-                    {/* Item 6: Attendance selector / launcher */}
+                    {/* Attendance selector / launcher */}
                     <div
                       style={{
                         backgroundColor: 'var(--bg-surface)',
@@ -576,10 +576,10 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                         </p>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '10px' }}>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                         <select
                           className="form-input"
-                          style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto' }}
+                          style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto', maxWidth: '100%' }}
                           onChange={(e) => {
                             const selected = todaysLectures.find((l) => l._id === e.target.value);
                             if (selected) setActiveFastMarkLecture(selected);
@@ -599,11 +599,13 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                           className="btn btn-primary"
                           style={{ padding: '8px 16px', fontSize: '0.86rem' }}
                         >
-                          <Zap size={14} /> Mark Demo Lecture
+                          <Zap size={14} /> Mark Fast Attendance
                         </button>
                       </div>
                     </div>
 
+                    <DatewiseAttendanceRegister onOpenFastMark={(lecture) => setActiveFastMarkLecture(lecture)} />
+                    <div style={{ height: '24px' }} />
                     <CourseAttendanceReport />
                     <LectureCalendar />
                   </div>
@@ -769,10 +771,10 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                         </p>
                       </div>
 
-                      <div style={{ display: 'flex', gap: '10px' }}>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                         <select
                           className="form-input"
-                          style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto' }}
+                          style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto', maxWidth: '100%' }}
                           onChange={(e) => {
                             const selected = todaysLectures.find((l) => l._id === e.target.value);
                             if (selected) setActiveFastMarkLecture(selected);
@@ -797,6 +799,8 @@ export const DashboardPage = ({ mobileSidebarOpen: externalMobileOpen, onCloseMo
                       </div>
                     </div>
 
+                    <DatewiseAttendanceRegister onOpenFastMark={(lecture) => setActiveFastMarkLecture(lecture)} />
+                    <div style={{ height: '24px' }} />
                     <CourseAttendanceReport />
                     <LectureCalendar />
                   </div>

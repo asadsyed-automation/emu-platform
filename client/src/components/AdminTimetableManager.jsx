@@ -424,22 +424,24 @@ export const AdminTimetableManager = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: '20px',
+            padding: '12px',
           }}
         >
           <div
             style={{
               backgroundColor: 'var(--bg-surface)',
               borderRadius: 'var(--radius-lg)',
-              maxWidth: '520px',
+              maxWidth: 'min(520px, 95vw)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
               width: '100%',
-              padding: '26px 28px',
+              padding: '20px 18px',
               boxShadow: 'var(--shadow-lg)',
               border: '1px solid var(--border-color)',
             }}
@@ -533,7 +535,7 @@ export const AdminTimetableManager = () => {
               )}
 
               {/* Time Window (Quick Preset vs Custom) */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '4px' }}>
                     Start Time
@@ -568,39 +570,41 @@ export const AdminTimetableManager = () => {
                 <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '4px' }}>
                   Room / Location
                 </label>
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   <input
                     type="text"
                     value={formRoom}
                     onChange={(e) => setFormRoom(e.target.value)}
                     placeholder="CTB1-02 or CLab-06 or Online"
                     className="form-input"
-                    style={{ flex: 1, padding: '8px 10px', fontSize: '0.88rem' }}
+                    style={{ flex: '1 1 140px', minWidth: '120px', padding: '8px 10px', fontSize: '0.88rem' }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setFormRoom('CTB1-02')}
-                    className="btn btn-outline"
-                    style={{ padding: '4px 8px', fontSize: '0.74rem' }}
-                  >
-                    CTB1-02
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormRoom('CLab-06')}
-                    className="btn btn-outline"
-                    style={{ padding: '4px 8px', fontSize: '0.74rem' }}
-                  >
-                    CLab-06
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormRoom('Online')}
-                    className="btn btn-outline"
-                    style={{ padding: '4px 8px', fontSize: '0.74rem' }}
-                  >
-                    Online
-                  </button>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => setFormRoom('CTB1-02')}
+                      className="btn btn-outline"
+                      style={{ padding: '4px 8px', fontSize: '0.74rem' }}
+                    >
+                      CTB1-02
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormRoom('CLab-06')}
+                      className="btn btn-outline"
+                      style={{ padding: '4px 8px', fontSize: '0.74rem' }}
+                    >
+                      CLab-06
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormRoom('Online')}
+                      className="btn btn-outline"
+                      style={{ padding: '4px 8px', fontSize: '0.74rem' }}
+                    >
+                      Online
+                    </button>
+                  </div>
                 </div>
               </div>
 

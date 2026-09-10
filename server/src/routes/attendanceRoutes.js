@@ -6,6 +6,7 @@ import {
   getStudentSummary,
   getCourseAttendanceSummary,
   updateAttendanceRecord,
+  toggleAttendanceCell,
 } from '../controllers/attendanceController.js';
 import { protect, requireRole } from '../middleware/auth.js';
 
@@ -19,6 +20,7 @@ router.get('/student/my-summary', getStudentSummary);
 // Teacher & Owner Endpoints
 router.post('/open-lecture/:lectureId', requireRole('teacher', 'owner'), openLectureAttendance);
 router.post('/mark/:lectureId', requireRole('teacher', 'owner'), markBulkAttendance);
+router.post('/toggle-cell', requireRole('teacher', 'owner'), toggleAttendanceCell);
 router.get('/lecture/:lectureId', requireRole('teacher', 'owner'), getLectureAttendance);
 router.get('/course/:courseId/summary', requireRole('teacher', 'owner'), getCourseAttendanceSummary);
 router.patch('/update-record/:recordId', requireRole('teacher', 'owner'), updateAttendanceRecord);

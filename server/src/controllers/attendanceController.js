@@ -357,3 +357,96 @@ export const updateAttendanceRecord = async (req, res) => {
     return res.status(500).json({ message: 'Error updating attendance record.', error: error.message });
   }
 };
+
+/**
+ * @desc 1-Click Interactive Attendance Cell Toggle (Date-Wise Register)
+ * @route POST /api/v1/attendance/toggle-cell
+ */
+export const toggleAttendanceCell = async (req, res) => {
+  try {
+    const { lectureId, studentId, courseId, status } = req.body;
+    if (!lectureId || !studentId) {
+      return res.status(400).json({ message: 'lectureId and studentId are required.' });
+    }
+
+    const lecture = await Lecture.findById(lectureId).populate('courseId');
+    if (!lecture) {
+      return res.status(404).json({ message: 'Lecture not found.' });
+    }
+
+    const effectiveCourseId = courseId || lecture.courseId?._id;
+
+    // Check teacher permission (must be assigned teacher, demo teacher, or owner)
+    const isTeacherAuthorized =
+      req.user.role === 'owner' ||
+      req.user.rollNumber === 'DEMO-TCH-01' ||
+      (lecture.courseId?.teacherId && lecture.courseId.teacherId.toString() === req.user._id.toString());
+
+    if (req.user.role === 'teacher' && !isTeacherAuthorized) {
+      return res.status(403).json({ message: 'Forbidden. You are not the teacher for this course.' });
+    }
+
+    // Determine target status ('present' or 'absent')
+    let targetStatus = 'present';
+    if (status) {
+      targetStatus = (status === 'P' || status === 'present') ? 'present' : 'absent';
+    } else {
+      // Find existing record to toggle
+      const existing = await AttendanceRecord.findOne({ lectureId, studentId });
+      if (existing) {
+        targetStatus = existing.status === 'present' ? 'absent' : 'present';
+      } else {
+        targetStatus = 'present';
+      }
+    }
+
+    let record = await AttendanceRecord.findOne({ lectureId, studentId });
+    if (!record) {
+      record = new AttendanceRecord({
+        lectureId,
+        courseId: effectiveCourseId,
+        studentId,
+        status: targetStatus,
+        markedBy: req.user._id,
+        markedAt: new Date(),
+        history: [
+          {
+            previousStatus: undefined,
+            newStatus: targetStatus,
+            changedBy: req.user._id,
+            changedAt: new Date(),
+            reason: 'Interactive toggle via Date-Wise Attendance Register',
+          },
+        ],
+      });
+    } else {
+      const prev = record.status;
+      record.status = targetStatus;
+      record.markedBy = req.user._id;
+      record.markedAt = new Date();
+      record.history.push({
+        previousStatus: prev,
+        newStatus: targetStatus,
+        changedBy: req.user._id,
+        changedAt: new Date(),
+        reason: 'Toggled via Date-Wise Attendance Register',
+      });
+    }
+
+    await record.save();
+
+    // Mark lecture status as attendance-closed so it registers in summaries
+    lecture.status = 'attendance-closed';
+    await lecture.save();
+
+    return res.status(200).json({
+      message: `Student status set to ${targetStatus.toUpperCase()}`,
+      status: targetStatus === 'present' ? 'P' : 'A',
+      record,
+    });
+  } catch (error) {
+    console.error('Toggle Attendance Cell Error:', error);
+    return res.status(500).json({ message: 'Error toggling attendance status.', error: error.message });
+  }
+};
+

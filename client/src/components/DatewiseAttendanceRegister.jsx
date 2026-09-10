@@ -1,12 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
-import { Printer, Download, Filter, FileSpreadsheet, Check, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import {
+  Printer,
+  Download,
+  FileSpreadsheet,
+  Check,
+  X,
+  Clock,
+  Zap,
+  CheckCircle2,
+  AlertCircle,
+  HelpCircle,
+  Sparkles,
+  Lock,
+} from 'lucide-react';
 
-export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
+export const DatewiseAttendanceRegister = ({ initialCourseId, onOpenFastMark }) => {
+  const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(initialCourseId || '');
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [actionMessage, setActionMessage] = useState('');
+  const [togglingCell, setTogglingCell] = useState(null); // 'studentId-lectureId'
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -41,6 +58,66 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
     fetchRegister();
   }, [selectedCourse]);
 
+  const handleCellClick = async (student, col) => {
+    // If future date, prevent edit
+    if (col.isFuture) return;
+
+    const sId = student.studentId;
+    const lId = col.lectureId;
+    const cellKey = `${sId}-${lId}`;
+    if (togglingCell === cellKey) return;
+
+    const currentVal = student.attendanceMap[lId] || '-';
+    // Cycle: '-' -> 'P' -> 'A' -> 'P'
+    const nextVal = currentVal === 'P' ? 'A' : 'P';
+
+    // Optimistic UI update
+    setTogglingCell(cellKey);
+    const updatedStudents = reportData.students.map((s) => {
+      if (s.studentId === sId) {
+        const newMap = { ...s.attendanceMap, [lId]: nextVal };
+        let pres = 0;
+        let abs = 0;
+        Object.entries(newMap).forEach(([k, v]) => {
+          if (v === 'P') pres++;
+          else if (v === 'A') abs++;
+        });
+        const totalMarked = pres + abs;
+        const pct = totalMarked > 0 ? parseFloat(((pres / totalMarked) * 100).toFixed(1)) : null;
+        return {
+          ...s,
+          attendanceMap: newMap,
+          presentCount: pres,
+          absentCount: abs,
+          percentage: pct,
+        };
+      }
+      return s;
+    });
+
+    setReportData({
+      ...reportData,
+      students: updatedStudents,
+    });
+
+    try {
+      await API.post('/attendance/toggle-cell', {
+        lectureId: lId,
+        studentId: sId,
+        courseId: selectedCourse,
+        status: nextVal,
+      });
+      setActionMessage(`Updated ${student.rollNumber} to ${nextVal === 'P' ? 'Present' : 'Absent'}`);
+      setTimeout(() => setActionMessage(''), 2500);
+    } catch (err) {
+      console.error('Error updating cell:', err);
+      // Revert on error
+      fetchRegister();
+    } finally {
+      setTogglingCell(null);
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -53,7 +130,16 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
     csv += `Course: ${course.title} (${course.code}), Teacher: ${course.teacherName}, Semester: ${course.semesterLabel}\n\n`;
 
     // Header row
-    const headers = ['SR #', 'Roll Number', 'Student Name', ...dateColumns.map((d) => d.dateStr), 'Total Held', 'Presents', 'Absents', 'Attendance %'];
+    const headers = [
+      'SR #',
+      'Roll Number',
+      'Student Name',
+      ...dateColumns.map((d) => `${d.dateStr} (${d.dayOfWeek || ''})`),
+      'Total Held',
+      'Presents',
+      'Absents',
+      'Attendance %',
+    ];
     csv += headers.map((h) => `"${h}"`).join(',') + '\n';
 
     // Student rows
@@ -62,11 +148,11 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
         idx + 1,
         s.rollNumber,
         s.name,
-        ...dateColumns.map((col) => s.attendanceMap[col.lectureId] || 'A'),
-        dateColumns.length,
+        ...dateColumns.map((col) => s.attendanceMap[col.lectureId] || '-'),
+        reportData.totalMarkedLectures || 0,
         s.presentCount,
         s.absentCount,
-        `${s.percentage}%`,
+        s.percentage !== null ? `${s.percentage}%` : 'N/A',
       ];
       csv += row.map((cell) => `"${cell}"`).join(',') + '\n';
     });
@@ -85,154 +171,386 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
   const students = reportData?.students || [];
 
   return (
-    <div style={{
-      backgroundColor: 'var(--bg-surface)',
-      borderRadius: 'var(--radius-lg)',
-      padding: '28px',
-      boxShadow: 'var(--shadow-sm)',
-      border: '1px solid var(--border-color)',
-      marginBottom: '30px'
-    }}>
+    <div
+      style={{
+        backgroundColor: 'var(--bg-surface)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '24px 20px',
+        boxShadow: 'var(--shadow-sm)',
+        border: '1px solid var(--border-color)',
+        marginBottom: '30px',
+      }}
+    >
       {/* Top Action Bar (Hidden on Print) */}
-      <div className="no-print" style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '24px',
-        flexWrap: 'wrap',
-        gap: '12px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <FileSpreadsheet style={{ color: 'var(--eum-maroon)' }} size={26} />
+      <div
+        className="no-print"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '20px',
+          flexWrap: 'wrap',
+          gap: '14px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div
+            style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(122, 31, 31, 0.1)',
+              color: 'var(--eum-maroon)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <FileSpreadsheet size={24} />
+          </div>
           <div>
-            <h3 style={{ fontSize: '1.3rem', color: 'var(--eum-maroon)' }}>
-              Page A — Date-Wise Attendance Register
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--eum-maroon)', margin: 0 }}>
+              Page A — Official Date-Wise Attendance Register
             </h3>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Auto-compiled course attendance matrix replacing manual Excel sheets
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+              Full 16-week semester calendar matrix • Click any past/today cell to toggle attendance
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <select
-            value={selectedCourse}
-            onChange={(e) => setSelectedCourse(e.target.value)}
-            className="form-input"
-            style={{ padding: '8px 12px', fontSize: '0.88rem', width: 'auto' }}
-          >
-            {courses.map((c) => (
-              <option key={c._id} value={c._id}>{c.code} — {c.title}</option>
-            ))}
-          </select>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {courses.length > 1 && (
+            <select
+              value={selectedCourse}
+              onChange={(e) => setSelectedCourse(e.target.value)}
+              className="form-input"
+              style={{ padding: '8px 12px', fontSize: '0.86rem', width: 'auto', maxWidth: '100%' }}
+            >
+              {courses.map((c) => (
+                <option key={c._id} value={c._id}>
+                  {c.code} — {c.title}
+                </option>
+              ))}
+            </select>
+          )}
 
-          <button onClick={handleExportCSV} className="btn btn-secondary" style={{ padding: '8px 14px', fontSize: '0.85rem' }}>
+          <button
+            onClick={handleExportCSV}
+            className="btn btn-secondary"
+            style={{ padding: '8px 14px', fontSize: '0.84rem' }}
+          >
             <Download size={14} /> Export CSV
           </button>
 
-          <button onClick={handlePrint} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.85rem' }}>
-            <Printer size={14} /> Print Register (PDF)
+          <button
+            onClick={handlePrint}
+            className="btn btn-primary"
+            style={{ padding: '8px 16px', fontSize: '0.84rem' }}
+          >
+            <Printer size={14} /> Print (PDF)
           </button>
         </div>
       </div>
 
+      {/* Action Notification */}
+      {actionMessage && (
+        <div
+          className="no-print"
+          style={{
+            backgroundColor: 'var(--status-success-bg)',
+            color: 'var(--status-success)',
+            padding: '8px 14px',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: '0.82rem',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <CheckCircle2 size={14} />
+          <span>{actionMessage}</span>
+        </div>
+      )}
+
+      {/* Legend & Instructions (Hidden on Print) */}
+      <div
+        className="no-print"
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '10px',
+          backgroundColor: 'var(--bg-main)',
+          padding: '10px 14px',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid var(--border-color)',
+          fontSize: '0.78rem',
+          color: 'var(--text-muted)',
+          marginBottom: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>Legend:</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <strong style={{ color: 'var(--eum-green)', backgroundColor: 'rgba(28,92,52,0.12)', padding: '2px 6px', borderRadius: '4px' }}>P</strong> Present
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <strong style={{ color: 'var(--status-danger)', backgroundColor: 'rgba(179,55,44,0.12)', padding: '2px 6px', borderRadius: '4px' }}>A</strong> Absent
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <strong style={{ color: 'var(--text-muted)', backgroundColor: 'rgba(100,100,100,0.12)', padding: '2px 6px', borderRadius: '4px' }}>-</strong> Blank / Not Marked
+          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', opacity: 0.75 }}>
+            <Lock size={12} /> Upcoming (Disabled)
+          </span>
+        </div>
+        <div style={{ fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--eum-maroon)' }}>
+          💡 Tip: Click any cell on past/today dates to cycle status.
+        </div>
+      </div>
+
       {loading ? (
-        <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
-          Generating date-wise register...
+        <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+          Loading 16-week date-wise register...
         </div>
       ) : (
         <div className="print-container">
           {/* Official Emerson University Multan Header Block */}
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '20px',
-            borderBottom: '2px solid var(--eum-maroon)',
-            paddingBottom: '16px'
-          }}>
-            <h2 style={{ fontSize: '1.5rem', color: 'var(--eum-maroon)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+          <div
+            style={{
+              textAlign: 'center',
+              marginBottom: '16px',
+              borderBottom: '2px solid var(--eum-maroon)',
+              paddingBottom: '14px',
+            }}
+          >
+            <h2
+              style={{
+                fontSize: '1.45rem',
+                color: 'var(--eum-maroon)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                margin: 0,
+              }}
+            >
               Emerson University Multan
             </h2>
-            <h4 style={{ fontSize: '1rem', color: 'var(--eum-green)', fontWeight: '600', marginTop: '2px' }}>
+            <h4 style={{ fontSize: '0.96rem', color: 'var(--eum-green)', fontWeight: '600', marginTop: '3px', margin: 0 }}>
               Faculty of Computing & Emerging Technologies • BS(CS) Section-A
             </h4>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '12px',
-              fontSize: '0.88rem',
-              fontWeight: '600',
-              color: 'var(--text-dark)'
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '10px',
+                fontSize: '0.84rem',
+                fontWeight: '600',
+                color: 'var(--text-dark)',
+                flexWrap: 'wrap',
+                gap: '8px',
+              }}
+            >
               <div>Course: <strong>{courseInfo?.title} ({courseInfo?.code})</strong></div>
               <div>Instructor: <strong>{courseInfo?.teacherName}</strong></div>
-              <div>Semester: <strong>{courseInfo?.semesterLabel}</strong></div>
+              <div>Semester: <strong>{courseInfo?.semesterLabel} (Classes Started: 07 Sep 2026)</strong></div>
             </div>
           </div>
 
-          {/* Matrix Table */}
-          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-            <table style={{
-              minWidth: '700px',
-              width: '100%',
-              borderCollapse: 'collapse',
-              fontSize: '0.78rem',
-              textAlign: 'center'
-            }}>
+          {/* Matrix Table with Sticky Headers and Touch-Scroll */}
+          <div
+            style={{
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-sm)',
+              position: 'relative',
+              maxHeight: '650px',
+            }}
+          >
+            <table
+              style={{
+                minWidth: '850px',
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '0.78rem',
+                textAlign: 'center',
+              }}
+            >
               <thead>
-                <tr style={{ backgroundColor: 'var(--eum-maroon)', color: '#FFFFFF' }}>
-                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', width: '32px' }}>#</th>
-                  <th style={{ padding: '8px 6px', border: '1px solid #ddd', textAlign: 'left', width: '90px' }}>Roll No</th>
-                  <th style={{ padding: '8px 6px', border: '1px solid #ddd', textAlign: 'left', minWidth: '130px' }}>Student Name</th>
-                  {dateColumns.map((col) => (
-                    <th key={col.lectureId} style={{ padding: '6px 2px', border: '1px solid #ddd', fontSize: '0.72rem' }}>
-                      <div>{col.dateStr}</div>
-                      <div style={{ fontSize: '0.65rem', opacity: 0.85 }}>{col.isLab ? 'Lab' : 'Reg'}</div>
-                    </th>
-                  ))}
-                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', backgroundColor: 'var(--eum-green-dark)' }}>Held</th>
-                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', backgroundColor: 'var(--eum-green-dark)' }}>P</th>
-                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', backgroundColor: 'var(--eum-maroon-dark)' }}>A</th>
-                  <th style={{ padding: '8px 6px', border: '1px solid #ddd', backgroundColor: 'var(--eum-green-dark)' }}>%</th>
+                <tr style={{ backgroundColor: 'var(--eum-maroon)', color: '#FFFFFF', position: 'sticky', top: 0, zIndex: 10 }}>
+                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', width: '32px', position: 'sticky', left: 0, backgroundColor: 'var(--eum-maroon)', zIndex: 11 }}>#</th>
+                  <th style={{ padding: '8px 6px', border: '1px solid #ddd', textAlign: 'left', width: '90px', position: 'sticky', left: '32px', backgroundColor: 'var(--eum-maroon)', zIndex: 11 }}>Roll No</th>
+                  <th style={{ padding: '8px 6px', border: '1px solid #ddd', textAlign: 'left', minWidth: '130px', position: 'sticky', left: '122px', backgroundColor: 'var(--eum-maroon)', zIndex: 11 }}>Student Name</th>
+                  {dateColumns.map((col) => {
+                    const isFut = col.isFuture;
+                    return (
+                      <th
+                        key={col.lectureId}
+                        style={{
+                          padding: '6px 3px',
+                          border: '1px solid #ddd',
+                          fontSize: '0.70rem',
+                          minWidth: '42px',
+                          backgroundColor: isFut ? '#5c1b1b' : col.isToday ? 'var(--eum-green)' : 'var(--eum-maroon)',
+                          opacity: isFut ? 0.65 : 1,
+                        }}
+                        title={isFut ? `Upcoming scheduled class (${col.dayOfWeek})` : `Class held on ${col.dateStr}`}
+                      >
+                        <div style={{ fontWeight: '700' }}>{col.dateStr}</div>
+                        <div style={{ fontSize: '0.62rem', opacity: 0.85 }}>
+                          {col.dayOfWeek ? col.dayOfWeek.slice(0, 3) : ''}
+                        </div>
+                        {isFut && (
+                          <div style={{ fontSize: '0.58rem', backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: '2px', padding: '1px 2px', marginTop: '2px' }}>
+                            Future
+                          </div>
+                        )}
+                        {!isFut && onOpenFastMark && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onOpenFastMark(col);
+                            }}
+                            className="no-print"
+                            style={{
+                              marginTop: '2px',
+                              padding: '1px 4px',
+                              fontSize: '0.58rem',
+                              backgroundColor: '#FFFFFF',
+                              color: 'var(--eum-maroon)',
+                              border: 'none',
+                              borderRadius: '2px',
+                              cursor: 'pointer',
+                              fontWeight: '700',
+                            }}
+                            title="Fast Mark Lecture"
+                          >
+                            Mark
+                          </button>
+                        )}
+                      </th>
+                    );
+                  })}
+                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', backgroundColor: 'var(--eum-green-dark)', minWidth: '42px' }}>Held</th>
+                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', backgroundColor: 'var(--eum-green-dark)', minWidth: '38px' }}>P</th>
+                  <th style={{ padding: '8px 4px', border: '1px solid #ddd', backgroundColor: 'var(--eum-maroon-dark)', minWidth: '38px' }}>A</th>
+                  <th style={{ padding: '8px 6px', border: '1px solid #ddd', backgroundColor: 'var(--eum-green-dark)', minWidth: '55px' }}>%</th>
                 </tr>
               </thead>
               <tbody>
                 {students.map((s, idx) => (
-                  <tr key={s.studentId} style={{ backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-subtle)' }}>
-                    <td style={{ padding: '4px', border: '1px solid var(--border-color)', fontWeight: '600' }}>{idx + 1}</td>
-                    <td style={{ padding: '4px 6px', border: '1px solid #ddd', textAlign: 'left', fontWeight: '700', color: 'var(--eum-maroon)' }}>
+                  <tr
+                    key={s.studentId}
+                    style={{
+                      backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-subtle)',
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: '4px',
+                        border: '1px solid var(--border-color)',
+                        fontWeight: '600',
+                        position: 'sticky',
+                        left: 0,
+                        backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-subtle)',
+                        zIndex: 5,
+                      }}
+                    >
+                      {idx + 1}
+                    </td>
+                    <td
+                      style={{
+                        padding: '4px 6px',
+                        border: '1px solid #ddd',
+                        textAlign: 'left',
+                        fontWeight: '700',
+                        color: 'var(--eum-maroon)',
+                        position: 'sticky',
+                        left: '32px',
+                        backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-subtle)',
+                        zIndex: 5,
+                      }}
+                    >
                       {s.rollNumber}
                     </td>
-                    <td style={{ padding: '4px 6px', border: '1px solid #ddd', textAlign: 'left', fontWeight: '600' }}>
+                    <td
+                      style={{
+                        padding: '4px 6px',
+                        border: '1px solid #ddd',
+                        textAlign: 'left',
+                        fontWeight: '600',
+                        position: 'sticky',
+                        left: '122px',
+                        backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg-subtle)',
+                        zIndex: 5,
+                      }}
+                    >
                       {s.name}
                     </td>
                     {dateColumns.map((col) => {
-                      const val = s.attendanceMap[col.lectureId];
+                      const val = s.attendanceMap[col.lectureId] || '-';
+                      const isFut = col.isFuture;
+
+                      let cellBg = 'transparent';
+                      let cellColor = 'var(--text-muted)';
+                      if (val === 'P') {
+                        cellBg = 'rgba(28,92,52,0.12)';
+                        cellColor = 'var(--eum-green)';
+                      } else if (val === 'A') {
+                        cellBg = 'rgba(179,55,44,0.12)';
+                        cellColor = 'var(--status-danger)';
+                      }
+
                       return (
                         <td
                           key={col.lectureId}
+                          onClick={() => handleCellClick(s, col)}
                           style={{
                             padding: '4px 2px',
                             border: '1px solid #ddd',
                             fontWeight: '700',
-                            color: val === 'P' ? 'var(--eum-green)' : 'var(--status-danger)',
-                            backgroundColor: val === 'P' ? 'rgba(28,92,52,0.06)' : 'rgba(179,55,44,0.06)'
+                            color: cellColor,
+                            backgroundColor: isFut ? 'rgba(0,0,0,0.02)' : cellBg,
+                            cursor: isFut ? 'not-allowed' : 'pointer',
+                            opacity: isFut ? 0.45 : 1,
+                            userSelect: 'none',
+                            transition: 'background-color 0.15s ease',
                           }}
+                          title={isFut ? 'Upcoming date - cannot mark in advance' : `Click to toggle status for ${s.rollNumber}`}
                         >
-                          {val}
+                          {isFut ? '-' : val}
                         </td>
                       );
                     })}
-                    <td style={{ padding: '4px', border: '1px solid #ddd', fontWeight: '700' }}>{dateColumns.length}</td>
-                    <td style={{ padding: '4px', border: '1px solid #ddd', fontWeight: '700', color: 'var(--eum-green)' }}>{s.presentCount}</td>
-                    <td style={{ padding: '4px', border: '1px solid #ddd', fontWeight: '700', color: 'var(--status-danger)' }}>{s.absentCount}</td>
-                    <td style={{
-                      padding: '4px 6px',
-                      border: '1px solid #ddd',
-                      fontWeight: '800',
-                      color: s.percentage >= 75 ? 'var(--eum-green)' : s.percentage >= 65 ? 'var(--status-warning)' : 'var(--status-danger)'
-                    }}>
-                      {s.percentage}%
+                    <td style={{ padding: '4px', border: '1px solid #ddd', fontWeight: '700' }}>
+                      {reportData.totalMarkedLectures || 0}
+                    </td>
+                    <td style={{ padding: '4px', border: '1px solid #ddd', fontWeight: '700', color: 'var(--eum-green)' }}>
+                      {s.presentCount}
+                    </td>
+                    <td style={{ padding: '4px', border: '1px solid #ddd', fontWeight: '700', color: 'var(--status-danger)' }}>
+                      {s.absentCount}
+                    </td>
+                    <td
+                      style={{
+                        padding: '4px 6px',
+                        border: '1px solid #ddd',
+                        fontWeight: '800',
+                        color:
+                          s.percentage === null
+                            ? 'var(--text-muted)'
+                            : s.percentage >= 75
+                            ? 'var(--eum-green)'
+                            : s.percentage >= 65
+                            ? 'var(--status-warning)'
+                            : 'var(--status-danger)',
+                      }}
+                    >
+                      {s.percentage !== null ? `${s.percentage}%` : 'N/A'}
                     </td>
                   </tr>
                 ))}
@@ -241,21 +559,25 @@ export const DatewiseAttendanceRegister = ({ initialCourseId }) => {
           </div>
 
           {/* Official Signature Footer */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: '40px',
-            paddingTop: '20px',
-            fontSize: '0.85rem',
-            color: 'var(--text-dark)'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: '36px',
+              paddingTop: '20px',
+              fontSize: '0.85rem',
+              color: 'var(--text-dark)',
+              flexWrap: 'wrap',
+              gap: '20px',
+            }}
+          >
             <div>
-              <div style={{ borderTop: '1px solid #000', width: '180px', paddingTop: '4px', textAlign: 'center', fontWeight: '600' }}>
+              <div style={{ borderTop: '1px solid #000', width: '200px', paddingTop: '4px', textAlign: 'center', fontWeight: '600' }}>
                 Course Instructor Signature
               </div>
             </div>
             <div>
-              <div style={{ borderTop: '1px solid #000', width: '180px', paddingTop: '4px', textAlign: 'center', fontWeight: '600' }}>
+              <div style={{ borderTop: '1px solid #000', width: '200px', paddingTop: '4px', textAlign: 'center', fontWeight: '600' }}>
                 Head of Department Signature
               </div>
             </div>

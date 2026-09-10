@@ -32,31 +32,45 @@ export const getAttendanceRegisterReport = async (req, res) => {
       return res.status(403).json({ message: 'Forbidden. You do not teach this course.' });
     }
 
-    // Fetch all attendance records for this course first to include any newly marked lectures
+    // Fetch all attendance records for this course
     const allRecords = await AttendanceRecord.find({ courseId });
-    const distinctMarkedLectureIds = [...new Set(allRecords.map((r) => r.lectureId.toString()))];
+    const distinctMarkedLectureIds = new Set(allRecords.map((r) => r.lectureId.toString()));
 
-    // Fetch all closed/completed lectures or lectures with marked attendance, sorted by date
-    const lectures = await Lecture.find({
-      courseId,
-      $or: [
-        { status: 'attendance-closed' },
-        { _id: { $in: distinctMarkedLectureIds } },
-      ],
-    })
-      .populate('timetableSlotId', 'room isLab startTime')
+    // Fetch all lectures for this course sorted by date
+    const lectures = await Lecture.find({ courseId })
+      .populate('timetableSlotId', 'room isLab startTime endTime dayOfWeek')
       .sort({ date: 1 });
 
-    // Format columns metadata
-    const dateColumns = lectures.map((l) => ({
-      lectureId: l._id,
-      dateStr: new Date(l.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      fullDate: new Date(l.date).toISOString().split('T')[0],
-      room: l.timetableSlotId?.room || 'BOT-B1-F-102',
-      isLab: l.timetableSlotId?.isLab || false,
-    }));
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
 
-    // Fetch all enrolled 54 students (with fallback)
+    // Format columns metadata
+    const dateColumns = lectures.map((l) => {
+      const lecDate = new Date(l.date);
+      const lecMidnight = new Date(lecDate);
+      lecMidnight.setHours(0, 0, 0, 0);
+
+      const isFuture = lecMidnight > todayMidnight;
+      const isToday = lecMidnight.getTime() === todayMidnight.getTime();
+      const isPast = lecMidnight < todayMidnight;
+      const isMarked = distinctMarkedLectureIds.has(l._id.toString()) || l.status === 'attendance-closed';
+
+      return {
+        lectureId: l._id,
+        dateStr: lecDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        fullDate: lecDate.toISOString().split('T')[0],
+        dayOfWeek: l.timetableSlotId?.dayOfWeek || lecDate.toLocaleDateString('en-US', { weekday: 'short' }),
+        room: l.timetableSlotId?.room || 'CTB1-02',
+        isLab: l.timetableSlotId?.isLab || false,
+        status: l.status,
+        isFuture,
+        isToday,
+        isPast,
+        isMarked,
+      };
+    });
+
+    // Fetch all enrolled students (with fallback)
     let enrollments = await Enrollment.find({ courseId }).populate('studentId', 'name rollNumber email');
     let students = enrollments.map((e) => e.studentId).filter(Boolean);
 
@@ -73,8 +87,8 @@ export const getAttendanceRegisterReport = async (req, res) => {
       recordMap[sKey][lKey] = r.status === 'present' ? 'P' : 'A';
     });
 
+    const totalMarkedLectures = dateColumns.filter((c) => c.isMarked).length;
     const studentRows = [];
-    const totalLecturesCount = lectures.length;
 
     for (const student of students) {
       const sKey = student._id.toString();
@@ -85,13 +99,20 @@ export const getAttendanceRegisterReport = async (req, res) => {
       const attendanceMap = {};
 
       for (const col of dateColumns) {
-        const val = sAttendance[col.lectureId.toString()] || 'A';
-        attendanceMap[col.lectureId.toString()] = val;
-        if (val === 'P') presentCount++;
-        else absentCount++;
+        const colKey = col.lectureId.toString();
+        const val = sAttendance[colKey];
+        if (val) {
+          attendanceMap[colKey] = val;
+          if (val === 'P') presentCount++;
+          else absentCount++;
+        } else {
+          attendanceMap[colKey] = '-';
+        }
       }
 
-      const percentage = totalLecturesCount > 0 ? parseFloat(((presentCount / totalLecturesCount) * 100).toFixed(1)) : 100.0;
+      const percentage = totalMarkedLectures > 0
+        ? parseFloat(((presentCount / totalMarkedLectures) * 100).toFixed(1))
+        : null;
 
       studentRows.push({
         studentId: student._id,
@@ -110,15 +131,16 @@ export const getAttendanceRegisterReport = async (req, res) => {
     return res.status(200).json({
       institution: 'Emerson University Multan',
       department: 'Faculty of Computing and Emerging Technologies',
-      sectionLabel: 'BS(CS) 6th/7th Semester Evening Section-A',
+      sectionLabel: 'BS(CS) 7th Semester Evening Section-A',
       course: {
         id: course._id,
         code: course.code,
         title: course.title,
         teacherName: course.teacherId?.name || 'Faculty Member',
-        semesterLabel: 'Fall 2026',
+        semesterLabel: course.semesterLabel || 'Fall 2026',
       },
-      totalLectures: totalLecturesCount,
+      totalLectures: dateColumns.length,
+      totalMarkedLectures,
       dateColumns,
       students: studentRows,
       generatedAt: new Date().toISOString(),

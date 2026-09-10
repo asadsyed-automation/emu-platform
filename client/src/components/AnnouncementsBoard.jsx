@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import API from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   Bell,
@@ -9,82 +10,96 @@ import {
   CheckCircle,
   Pin,
   Sparkles,
-  Info,
+  Trash2,
+  AlertCircle,
+  Megaphone,
 } from 'lucide-react';
 
 export const AnnouncementsBoard = () => {
   const { user } = useAuth();
   const isTeacherOrAdmin = user?.role === 'teacher' || user?.role === 'owner';
 
-  // Seeded class announcements with persistent state
-  const [announcements, setAnnouncements] = useState([
-    {
-      id: 'ann-1',
-      title: '7th Semester Timetable & 75% Attendance Policy Verification',
-      content:
-        'All students in BS(CS) 7th Semester (Section 7A Evening) must maintain at least 75% attendance across all 6 courses. Evening shift timetable runs Mon-Fri (01:30 PM - 07:20 PM) in CTB1-02 and CLab-06.',
-      author: 'Pilot Administrator',
-      role: 'owner',
-      courseCode: 'All Courses',
-      date: '2026-08-16',
-      pinned: true,
-      tag: 'Academic Notice',
-    },
-    {
-      id: 'ann-2',
-      title: 'Analysis of Algorithms - Assignment 01 Dynamic Programming',
-      content:
-        'Please submit your algorithm design documentation and Google Drive execution video link for Assignment 01 before Friday 11:59 PM.',
-      author: 'Mr. Qasim Niaz',
-      role: 'teacher',
-      courseCode: 'COSC-4113',
-      date: '2026-08-15',
-      pinned: false,
-      tag: 'Assignment',
-    },
-    {
-      id: 'ann-3',
-      title: 'Compiler Construction Lab 01 Lexical Analyzer Setup',
-      content:
-        'Lab guidelines for Lexical Analyzer implementation in CLab-06 have been uploaded. Wednesday Evening Lab slot: 05:40 PM - 07:20 PM.',
-      author: 'Ms. Rozina Riaz',
-      role: 'teacher',
-      courseCode: 'COSE-4135',
-      date: '2026-08-14',
-      pinned: false,
-      tag: 'Project',
-    },
-  ]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [broadcastSuccess, setBroadcastSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Teacher / Admin Broadcast Form State
+  // Form State
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [courseCode, setCourseCode] = useState('All Courses');
   const [tag, setTag] = useState('General');
   const [pinned, setPinned] = useState(false);
-  const [broadcastSuccess, setBroadcastSuccess] = useState(false);
 
-  const handlePostAnnouncement = (e) => {
+  const fetchAnnouncements = async () => {
+    try {
+      setLoading(true);
+      const res = await API.get('/announcements');
+      setAnnouncements(res.data.announcements || []);
+    } catch (err) {
+      console.error('Error fetching announcements:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const res = await API.get('/courses');
+      setCourses(res.data.courses || []);
+      if (user?.role === 'teacher' && res.data.courses?.length > 0) {
+        setCourseCode(res.data.courses[0].code);
+      }
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnnouncements();
+    if (isTeacherOrAdmin) {
+      fetchCourses();
+    }
+  }, [user]);
+
+  const handlePostAnnouncement = async (e) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
 
-    const newAnn = {
-      id: `ann-${Date.now()}`,
-      title: title.trim(),
-      content: content.trim(),
-      author: user?.name || 'Faculty Member',
-      role: user?.role || 'teacher',
-      courseCode,
-      date: new Date().toISOString().split('T')[0],
-      pinned,
-      tag,
-    };
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      const res = await API.post('/announcements', {
+        title: title.trim(),
+        content: content.trim(),
+        courseCode,
+        tag,
+        pinned,
+      });
 
-    setAnnouncements([newAnn, ...announcements]);
-    setTitle('');
-    setContent('');
-    setBroadcastSuccess(true);
-    setTimeout(() => setBroadcastSuccess(false), 4000);
+      setAnnouncements([res.data.announcement, ...announcements]);
+      setTitle('');
+      setContent('');
+      setPinned(false);
+      setBroadcastSuccess(true);
+      setTimeout(() => setBroadcastSuccess(false), 4000);
+    } catch (err) {
+      setErrorMessage(err.response?.data?.message || 'Error publishing announcement.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this bulletin?')) return;
+    try {
+      await API.delete(`/announcements/${id}`);
+      setAnnouncements(announcements.filter((a) => a._id !== id));
+    } catch (err) {
+      alert('Error deleting announcement.');
+    }
   };
 
   return (
@@ -94,7 +109,7 @@ export const AnnouncementsBoard = () => {
         style={{
           backgroundColor: 'var(--bg-surface)',
           borderRadius: 'var(--radius-lg)',
-          padding: '24px 28px',
+          padding: '22px 26px',
           border: '1px solid var(--border-color)',
           boxShadow: 'var(--shadow-sm)',
           marginBottom: '24px',
@@ -148,103 +163,161 @@ export const AnnouncementsBoard = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: isTeacherOrAdmin ? '1fr 340px' : '1fr',
+          gridTemplateColumns: isTeacherOrAdmin ? 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))' : '1fr',
           gap: '24px',
           alignItems: 'start',
         }}
       >
         {/* Left Column: Announcements Feed */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {announcements.map((ann) => (
+          {loading ? (
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              Loading announcements...
+            </div>
+          ) : announcements.length === 0 ? (
             <div
-              key={ann.id}
-              className="card-hover animate-fade-in-up"
               style={{
                 backgroundColor: 'var(--bg-surface)',
                 borderRadius: 'var(--radius-md)',
-                padding: '22px 24px',
-                border: ann.pinned ? '2px solid var(--eum-gold)' : '1px solid var(--border-color)',
-                boxShadow: 'var(--shadow-sm)',
-                position: 'relative',
+                padding: '40px 24px',
+                textAlign: 'center',
+                border: '1px dashed var(--border-color)',
               }}
             >
-              {ann.pinned && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '16px',
-                    right: '18px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '0.72rem',
-                    fontWeight: '700',
-                    color: '#8C6800',
-                    backgroundColor: 'rgba(201, 162, 39, 0.14)',
-                    padding: '3px 8px',
-                    borderRadius: '12px',
-                  }}
-                >
-                  <Pin size={11} /> Pinned
-                </div>
-              )}
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                <span
-                  style={{
-                    fontSize: '0.72rem',
-                    fontWeight: '700',
-                    backgroundColor: 'var(--eum-maroon)',
-                    color: '#FFFFFF',
-                    padding: '3px 8px',
-                    borderRadius: '4px',
-                  }}
-                >
-                  {ann.courseCode}
-                </span>
-
-                <span
-                  style={{
-                    fontSize: '0.72rem',
-                    fontWeight: '600',
-                    backgroundColor: 'var(--bg-subtle)',
-                    color: 'var(--text-muted)',
-                    padding: '3px 8px',
-                    borderRadius: '4px',
-                  }}
-                >
-                  {ann.tag}
-                </span>
-
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', display: 'inline-flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
-                  <Calendar size={12} /> {ann.date}
-                </span>
-              </div>
-
-              <h3 style={{ fontSize: '1.15rem', color: 'var(--text-dark)', marginBottom: '8px' }}>
-                {ann.title}
-              </h3>
-
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '14px' }}>
-                {ann.content}
+              <Megaphone size={36} style={{ color: 'var(--text-light)', margin: '0 auto 12px' }} />
+              <h4 style={{ fontSize: '1.1rem', color: 'var(--text-dark)', marginBottom: '6px' }}>
+                No Announcements Yet
+              </h4>
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', maxWidth: '400px', margin: '0 auto' }}>
+                {isTeacherOrAdmin
+                  ? 'No notices have been published yet for BSCS 7th Semester. Use the broadcast form to send important updates to your students.'
+                  : 'There are no active bulletins at the moment. Official notices from faculty will appear here.'}
               </p>
-
+            </div>
+          ) : (
+            announcements.map((ann) => (
               <div
+                key={ann._id}
+                className="card-hover animate-fade-in-up"
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '0.78rem',
-                  color: 'var(--text-muted)',
-                  borderTop: '1px solid var(--border-color)',
-                  paddingTop: '10px',
+                  backgroundColor: 'var(--bg-surface)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '20px 22px',
+                  border: ann.pinned ? '2px solid var(--eum-gold)' : '1px solid var(--border-color)',
+                  boxShadow: 'var(--shadow-sm)',
+                  position: 'relative',
                 }}
               >
-                <User size={13} style={{ color: 'var(--eum-maroon)' }} />
-                <span>Posted by <strong>{ann.author}</strong> ({ann.role.toUpperCase()})</span>
+                {ann.pinned && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '16px',
+                      right: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '0.72rem',
+                      fontWeight: '700',
+                      color: '#8C6800',
+                      backgroundColor: 'rgba(201, 162, 39, 0.14)',
+                      padding: '3px 8px',
+                      borderRadius: '12px',
+                    }}
+                  >
+                    <Pin size={11} /> Pinned
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      fontWeight: '700',
+                      backgroundColor: 'var(--eum-maroon)',
+                      color: '#FFFFFF',
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    {ann.courseCode}
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      fontWeight: '600',
+                      backgroundColor: 'var(--bg-subtle)',
+                      color: 'var(--text-muted)',
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                    }}
+                  >
+                    {ann.tag}
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: '0.75rem',
+                      color: 'var(--text-light)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    <Calendar size={12} /> {new Date(ann.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <h3 style={{ fontSize: '1.12rem', color: 'var(--text-dark)', marginBottom: '8px' }}>
+                  {ann.title}
+                </h3>
+
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '14px', whiteSpace: 'pre-wrap' }}>
+                  {ann.content}
+                </p>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    fontSize: '0.78rem',
+                    color: 'var(--text-muted)',
+                    borderTop: '1px solid var(--border-color)',
+                    paddingTop: '10px',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <User size={13} style={{ color: 'var(--eum-maroon)' }} />
+                    <span>Posted by <strong>{ann.author?.name || 'Faculty Member'}</strong> ({ann.author?.role?.toUpperCase() || 'FACULTY'})</span>
+                  </div>
+
+                  {(user?.role === 'owner' || user?._id === ann.author?._id) && (
+                    <button
+                      onClick={() => handleDeleteAnnouncement(ann._id)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--status-danger)',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.74rem',
+                      }}
+                      title="Delete Bulletin"
+                    >
+                      <Trash2 size={13} /> Delete
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Right Column: Teacher / Admin Broadcast Publisher */}
@@ -256,8 +329,6 @@ export const AnnouncementsBoard = () => {
               padding: '22px',
               border: '1px solid var(--border-color)',
               boxShadow: 'var(--shadow-sm)',
-              position: 'sticky',
-              top: '80px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
@@ -283,6 +354,24 @@ export const AnnouncementsBoard = () => {
               </div>
             )}
 
+            {errorMessage && (
+              <div
+                style={{
+                  backgroundColor: 'var(--status-danger-bg)',
+                  color: 'var(--status-danger)',
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.82rem',
+                  marginBottom: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <AlertCircle size={14} /> {errorMessage}
+              </div>
+            )}
+
             <form onSubmit={handlePostAnnouncement}>
               <div className="form-group" style={{ marginBottom: '12px' }}>
                 <label className="form-label" style={{ fontSize: '0.82rem' }}>Target Course</label>
@@ -292,13 +381,17 @@ export const AnnouncementsBoard = () => {
                   value={courseCode}
                   onChange={(e) => setCourseCode(e.target.value)}
                 >
-                  <option value="All Courses">All Courses (Class-wide)</option>
-                  <option value="COSC-4113">COSC-4113 — Analysis of Algorithms</option>
-                  <option value="COSE-4135">COSE-4135 — Compiler Construction</option>
-                  <option value="COSE-4150">COSE-4150 — Computer Graphics</option>
-                  <option value="IT-404">IT-404 — Cyber Security</option>
-                  <option value="FLNG-xxxx">FLNG-xxxx — Foreign Language</option>
-                  <option value="ARAB-3101">ARAB-3101 — Translation of the Holy Quran-V</option>
+                  {user?.role === 'owner' && (
+                    <option value="All Courses">All Courses (Class-wide)</option>
+                  )}
+                  {courses.map((c) => (
+                    <option key={c._id} value={c.code}>
+                      {c.code} — {c.title}
+                    </option>
+                  ))}
+                  {user?.role !== 'owner' && courses.length === 0 && (
+                    <option value="All Courses">All Courses</option>
+                  )}
                 </select>
               </div>
 
@@ -308,7 +401,7 @@ export const AnnouncementsBoard = () => {
                   type="text"
                   className="form-input"
                   style={{ fontSize: '0.88rem', padding: '8px 12px' }}
-                  placeholder="e.g. Lab 04 Submission Extended"
+                  placeholder="e.g. Lab Guidelines / Schedule Update"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
@@ -328,8 +421,8 @@ export const AnnouncementsBoard = () => {
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', alignItems: 'center' }}>
-                <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '130px' }}>
                   <label className="form-label" style={{ fontSize: '0.78rem' }}>Tag</label>
                   <select
                     className="form-input"
@@ -361,10 +454,11 @@ export const AnnouncementsBoard = () => {
 
               <button
                 type="submit"
+                disabled={submitting}
                 className="btn btn-primary"
                 style={{ width: '100%', padding: '10px', fontSize: '0.9rem' }}
               >
-                <Send size={14} /> Broadcast Announcement
+                <Send size={14} /> {submitting ? 'Broadcasting...' : 'Broadcast Announcement'}
               </button>
             </form>
           </div>

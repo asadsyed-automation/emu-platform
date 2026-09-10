@@ -157,7 +157,7 @@ export const AdminTeacherManager = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
             onClick={openAddModal}
             className="btn btn-primary"
@@ -213,13 +213,12 @@ export const AdminTeacherManager = () => {
           <span>{error}</span>
         </div>
       )}
-
       {/* Faculty Table */}
       <div
         style={{
           backgroundColor: 'var(--bg-surface)',
           borderRadius: 'var(--radius-md)',
-          padding: '24px',
+          padding: '20px',
           border: '1px solid var(--border-color)',
           boxShadow: 'var(--shadow-sm)',
         }}
@@ -294,22 +293,24 @@ export const AdminTeacherManager = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: '20px',
+            padding: '12px',
           }}
         >
           <div
             style={{
               backgroundColor: 'var(--bg-surface)',
               borderRadius: 'var(--radius-lg)',
-              maxWidth: '480px',
+              maxWidth: 'min(480px, 95vw)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
               width: '100%',
-              padding: '26px 28px',
+              padding: '20px 18px',
               boxShadow: 'var(--shadow-lg)',
               border: '1px solid var(--border-color)',
             }}

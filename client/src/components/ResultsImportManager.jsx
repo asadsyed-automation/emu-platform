@@ -95,7 +95,7 @@ export const ResultsImportManager = () => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <label
             className="btn btn-outline"
             style={{ padding: '9px 16px', fontSize: '0.86rem', cursor: 'pointer' }}

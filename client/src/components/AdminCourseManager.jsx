@@ -377,22 +377,24 @@ export const AdminCourseManager = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
             backdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: '20px',
+            padding: '12px',
           }}
         >
           <div
             style={{
               backgroundColor: 'var(--bg-surface)',
               borderRadius: 'var(--radius-lg)',
-              maxWidth: '540px',
+              maxWidth: 'min(540px, 95vw)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
               width: '100%',
-              padding: '26px 28px',
+              padding: '20px 18px',
               boxShadow: 'var(--shadow-lg)',
               border: '1px solid var(--border-color)',
             }}
@@ -410,7 +412,7 @@ export const AdminCourseManager = () => {
             </div>
 
             <form onSubmit={handleSaveCourse} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '4px' }}>
                     Course Code *
@@ -462,7 +464,7 @@ export const AdminCourseManager = () => {
                 </select>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 100px), 1fr))', gap: '10px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '4px' }}>
                     Credit Hours
@@ -506,7 +508,7 @@ export const AdminCourseManager = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', marginBottom: '4px' }}>
                     Semester Label
